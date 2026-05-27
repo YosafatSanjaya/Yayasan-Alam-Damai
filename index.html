@@ -76,7 +76,7 @@
       </div>
 
       <div class="relative mb-4">
-        <input type="text" id="searchInput" placeholder="🔍 Cari Nama Keluarga..." onkeyup="renderList()" class="w-full px-4 py-3 bg-gray-50 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-blue-500 focus:bg-white transition">
+        <input type="text" id="searchInput" placeholder="🔍 Cari nama keluarga atau anggota..." onkeyup="renderList()" class="w-full px-4 py-3 bg-gray-50 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-blue-500 focus:bg-white transition">
       </div>
 
       <div id="familyList" class="space-y-2 max-h-[55vh] overflow-y-auto pr-2 custom-scrollbar">
@@ -118,6 +118,9 @@
           <div class="grid grid-cols-12 gap-y-2 gap-x-4 mb-6 text-base px-2">
             <div class="col-span-2 font-bold text-gray-700">No. Kartu</div>
             <div class="col-span-10 font-semibold text-blue-900">: <span id="lblNoKartu"></span></div>
+
+            <div class="col-span-2 font-bold text-gray-700">No. Telepon</div>
+            <div class="col-span-10 font-semibold text-blue-900">: <span id="lblNoTelp"></span></div>
             
             <div class="col-span-2 font-bold text-gray-700">Nama</div>
             <div class="col-span-10 font-semibold text-blue-900">: <span id="lblNama"></span></div>
@@ -154,7 +157,7 @@
             <div class="flex flex-col items-center">
               <p class="font-bold text-gray-800 mb-2">SEKRETARIS</p>
               <div class="h-20 flex items-center justify-center">
-                <img src="tt_sekretaris.png" alt="TT Secretary" class="max-h-full object-contain" onerror="this.style.display='none'">
+                <img src="tt_sekretaris.png" alt="TT Sekretaris" class="max-h-full object-contain" onerror="this.style.display='none'">
               </div>
               <p class="underline font-bold text-gray-800 mt-2">( Ibu Lucy )</p>
             </div>
@@ -162,7 +165,7 @@
             <div class="flex flex-col items-center">
               <p class="font-bold text-gray-800 mb-2">BENDAHARA</p>
               <div class="h-20 flex items-center justify-center">
-                <img src="tt_bendahara.png" alt="TT Treasurer" class="max-h-full object-contain" onerror="this.style.display='none'">
+                <img src="tt_bendahara.png" alt="TT Bendahara" class="max-h-full object-contain" onerror="this.style.display='none'">
               </div>
               <p class="underline font-bold text-gray-800 mt-2">( Ibu Suzan )</p>
             </div>
@@ -224,6 +227,7 @@
       });
     }
 
+    // FITUR BARU: PENCARIAN CERDAS MENCAKUP NAMA KELUARGA & ANGOTA KELUARGA
     function renderList() {
       const listContainer = document.getElementById('familyList');
       const search = document.getElementById('searchInput').value.toLowerCase();
@@ -232,11 +236,16 @@
       let hasResult = false;
 
       rawData.forEach((row, index) => {
-        if (row.Nama_Keluarga && row.Nama_Keluarga.toLowerCase().includes(search)) {
+        const namaKeluarga = row.Nama_Keluarga ? row.Nama_Keluarga.toLowerCase() : '';
+        const anggotaKeluarga = row.Anggota ? row.Anggota.toLowerCase() : '';
+
+        // Cek jika nama keluarga ATAU teks anggota mengandung kata kunci pencarian
+        if (namaKeluarga.includes(search) || anggotaKeluarga.includes(search)) {
           hasResult = true;
           const div = document.createElement('div');
           div.className = "p-4 border-2 rounded-xl cursor-pointer transition shadow-sm " + 
             (index === currentIndex ? "bg-blue-50 border-blue-500 shadow-blue-100" : "bg-white border-gray-100 hover:border-blue-300 hover:shadow-md");
+          
           div.innerHTML = `
             <div class="flex justify-between items-start">
               <div>
@@ -244,7 +253,8 @@
                   <span class="bg-blue-100 text-blue-800 px-2 py-0.5 rounded text-xs mr-1">No. ${row.No_Kartu}</span> 
                   ${row.Nama_Keluarga}
                 </p>
-                <p class="text-xs text-gray-500 line-clamp-1">${row.Alamat}</p>
+                <p class="text-xs text-gray-500 line-clamp-1">📍 ${row.Alamat}</p>
+                <p class="text-[11px] text-blue-600 mt-1 italic line-clamp-1 font-medium">👥 Anggota: ${row.Anggota || '-'}</p>
               </div>
             </div>`;
           div.onclick = () => selectFamily(index);
@@ -265,11 +275,13 @@
       updateCardPreview();
     }
 
+    // UPDATE PREVIEW (MENAMPILKAN FORMAT DAN NO TELEPON BARU)
     function updateCardPreview() {
       if (currentIndex === -1) return;
       const data = rawData[currentIndex];
 
       document.getElementById('lblNoKartu').innerText = data.No_Kartu || '-';
+      document.getElementById('lblNoTelp').innerText = data.No_Telp || '-'; // Render nomor telepon
       document.getElementById('lblNama').innerText = data.Nama_Keluarga || '-';
       document.getElementById('lblAlamat').innerText = data.Alamat || '-';
       document.getElementById('lblAnggota').innerText = data.Anggota || '-';
@@ -337,11 +349,13 @@
           label.className = "text-xs font-bold mb-2 text-gray-600 uppercase tracking-wide";
           label.innerText = h.replace('_', ' ');
           
+          // Input Kalender
           const inputDate = document.createElement('input');
           inputDate.type = "date";
           inputDate.className = "text-sm bg-white border border-gray-300 rounded-lg p-1.5 mb-2 outline-none font-semibold text-blue-900 cursor-pointer w-full focus:border-blue-500";
           inputDate.id = `input_date_${h}`;
           
+          // Input Angka Uang
           const inputNominal = document.createElement('input');
           inputNominal.type = "number";
           inputNominal.placeholder = "Isi Rp... (Cth: 40000)";
@@ -399,21 +413,21 @@
       alert('Tersimpan! Jangan lupa klik "SIMPAN/EXPORT CSV" supaya tanggal & nominal ini tidak hilang bulan depan.');
     }
 
-    // FITUR CERDAS: TOGGLE FULL SCREEN UNTUK SCREENSHOT MAMI
+    // MODUS LAYAR PENUH (FULLSCREEN OVERLAY) BIAR SCREENSHOT RAPI & BERSIH DI IPAD/HP
     function toggleFullScreen() {
       const container = document.getElementById('previewContainer');
       const exitBtn = document.getElementById('exitFullScreenBtn');
       
-      // Jika saat ini sedang mode fullscreen, kita kembalikan ke normal
       if (container.classList.contains('fixed')) {
+        // Balik ke normal
         container.className = "overflow-x-auto bg-gray-300 p-6 rounded-2xl shadow-inner flex flex-col items-center justify-center";
         exitBtn.classList.add('hidden');
-        document.body.classList.remove('overflow-hidden'); // Aktifkan scroll body kembali
+        document.body.classList.remove('overflow-hidden');
       } else {
-        // Jika normal, kita buat menjadi fixed melayang menutupi layar (Z-Index 50)
-        container.className = "fixed inset-0 bg-gray-800 z-50 p-6 flex flex-col items-center justify-start overflow-y-auto";
+        // Menjadi Overlay Full Layar
+        container.className = "fixed inset-0 bg-gray-900 z-50 p-6 flex flex-col items-center justify-start overflow-y-auto";
         exitBtn.classList.remove('hidden');
-        document.body.classList.add('overflow-hidden'); // Kunci scroll halaman belakang
+        document.body.classList.add('overflow-hidden');
       }
     }
 
