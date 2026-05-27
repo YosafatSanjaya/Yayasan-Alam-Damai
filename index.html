@@ -153,8 +153,8 @@
     </div>
   </div>
 
-  <div id="editModal" class="fixed inset-0 bg-black bg-opacity-60 backdrop-blur-sm flex items-center justify-center hidden z-50">
-    <div class="bg-white rounded-2xl shadow-2xl p-8 w-full max-w-3xl max-h-[90vh] flex flex-col">
+  <div id="editModal" class="fixed inset-0 bg-black bg-opacity-60 backdrop-blur-sm flex items-center justify-center hidden z-50 p-4">
+    <div class="bg-white rounded-2xl shadow-2xl p-6 lg:p-8 w-full max-w-4xl max-h-[90vh] flex flex-col">
       <h2 class="text-2xl font-black text-blue-800 mb-4 border-b-2 border-gray-100 pb-4">Edit Pembayaran</h2>
       
       <div class="overflow-y-auto flex-1 pr-2 space-y-5 custom-scrollbar">
@@ -165,9 +165,9 @@
         
         <div>
           <h3 class="font-bold text-gray-800 flex items-center gap-2">
-            📅 Set Tanggal Pembayaran
+            📅 Set Tanggal & Nominal Pembayaran
           </h3>
-          <p class="text-sm text-gray-500 mb-4 mt-1">Pilih tanggal untuk memunculkan format (tgl/bln) Rp. Nominal. Hapus tanggal jika ingin mengembalikan ke tampilan asal.</p>
+          <p class="text-sm text-gray-500 mb-4 mt-1">Kosongkan jika belum bayar. Jika bayar, isi tanggal dan uangnya. (Misal: 40000)</p>
           
           <div id="editMonthsContainer" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
             </div>
@@ -273,22 +273,17 @@
             let tanggal = '';
             let nominal = val;
 
-            // SISTEM PEMBACAAN TANGGAL DARI CSV
             if (val.includes('|')) {
               const parts = val.split('|');
               tanggal = parts[0];
               nominal = parts[1];
             }
 
-            if (tanggal) {
+            if (tanggal && nominal) {
               const dateObj = new Date(tanggal);
               const tgl = dateObj.getDate();
               const bln = dateObj.getMonth() + 1;
-              
-              // Mencegah tulisan Rp muncul kalau uangnya kosong
-              let textNominal = nominal ? `Rp.${nominal}` : '';
-              
-              td.innerHTML = `<span class="font-extrabold text-blue-700 bg-blue-50 px-1 py-1 rounded text-xs">(${tgl}/${bln}) ${textNominal}</span>`;
+              td.innerHTML = `<span class="font-extrabold text-blue-700 bg-blue-50 px-1 py-1 rounded text-xs">(${tgl}/${bln}) Rp.${nominal}</span>`;
             } else if (nominal !== '') {
               td.innerHTML = `<span class="text-green-600 font-bold text-xs">Lunas<br>(Rp ${nominal})</span>`;
             } else {
@@ -321,27 +316,35 @@
           label.className = "text-xs font-bold mb-2 text-gray-600 uppercase tracking-wide";
           label.innerText = h.replace('_', ' ');
           
-          const input = document.createElement('input');
-          input.type = "date";
-          input.className = "text-sm bg-transparent outline-none font-semibold text-blue-900 cursor-pointer w-full";
-          input.id = `input_${h}`;
+          // INPUT TANGGAL
+          const inputDate = document.createElement('input');
+          inputDate.type = "date";
+          inputDate.className = "text-sm bg-white border border-gray-300 rounded-lg p-1.5 mb-2 outline-none font-semibold text-blue-900 cursor-pointer w-full focus:border-blue-500";
+          inputDate.id = `input_date_${h}`;
+          
+          // INPUT NOMINAL
+          const inputNominal = document.createElement('input');
+          inputNominal.type = "number";
+          inputNominal.placeholder = "Isi Rp... (Cth: 40000)";
+          inputNominal.className = "text-sm bg-white border border-gray-300 rounded-lg p-1.5 outline-none font-semibold text-green-700 w-full focus:border-green-500";
+          inputNominal.id = `input_nom_${h}`;
           
           let cellVal = data[h] || '';
           let dateVal = '';
           let nomVal = cellVal;
 
-          // Memanggil kembali tanggal yang sudah tersimpan di file
           if (cellVal.includes('|')) {
             const parts = cellVal.split('|');
             dateVal = parts[0];
             nomVal = parts[1];
           }
 
-          input.value = dateVal;
-          input.dataset.nominal = nomVal; 
+          inputDate.value = dateVal;
+          inputNominal.value = nomVal;
 
           div.appendChild(label);
-          div.appendChild(input);
+          div.appendChild(inputDate);
+          div.appendChild(inputNominal);
           container.appendChild(div);
         }
       });
@@ -359,22 +362,25 @@
 
       headers.forEach(h => {
         if (h.includes('_202')) {
-          const inputEl = document.getElementById(`input_${h}`);
-          const inputVal = inputEl.value;
-          const oldNominal = inputEl.dataset.nominal || '';
+          const inputDateVal = document.getElementById(`input_date_${h}`).value;
+          const inputNomVal = document.getElementById(`input_nom_${h}`).value;
 
-          if (inputVal) {
-            // PROSES MENYIMPAN TANGGAL PERMANEN (Format: Tanggal|Nominal)
-            data[h] = `${inputVal}|${oldNominal}`;
+          if (inputDateVal && inputNomVal) {
+            // Kalau dua-duanya diisi, simpan Tanggal|Nominal
+            data[h] = `${inputDateVal}|${inputNomVal}`;
+          } else if (inputNomVal) {
+            // Kalau cuma isi uangnya tanpa tanggal
+            data[h] = inputNomVal;
           } else {
-            data[h] = oldNominal;
+            // Kalau kosong
+            data[h] = '';
           }
         }
       });
 
       closeModal();
       updateCardPreview();
-      alert('Tersimpan! Silakan klik tombol hijau "SIMPAN/EXPORT CSV" agar tanggalnya tidak hilang bulan depan.');
+      alert('Tersimpan! Jangan lupa klik "SIMPAN/EXPORT CSV" supaya tanggal & nominal ini tidak hilang bulan depan.');
     }
 
     function exportCSV() {
@@ -389,10 +395,9 @@
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
-      alert('CSV Berhasil Di-download! Pakai file baru ini untuk upload bulan depan ya.');
     }
 
-    // FUNGSI DOWNLOAD ASLI (TANPA useCORS BIAR AMAN DARI ERROR)
+    // FUNGSI DOWNLOAD
     async function downloadPNG() {
       const card = document.getElementById('cardPreview');
       try {
