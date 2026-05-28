@@ -19,20 +19,26 @@
     .custom-scrollbar::-webkit-scrollbar { width: 6px; }
     .custom-scrollbar::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 10px; }
     .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+    
+    /* Animasi transisi background slideshow */
+    #bgSlide { transition: background-image 1.5s ease-in-out; }
   </style>
 </head>
 <body class="bg-gray-100 min-h-screen text-gray-800 font-sans p-4 lg:p-8 overflow-hidden" id="mainBody">
 
-  <div id="lockScreen" class="fixed inset-0 bg-blue-900 z-[100] flex flex-col items-center justify-center p-4 transition-opacity duration-500">
-    <div class="bg-white p-8 rounded-3xl shadow-2xl w-full max-w-md text-center">
-      
+  <div id="lockScreen" class="fixed inset-0 z-[100] flex flex-col items-center justify-center p-4 transition-opacity duration-500">
+    
+    <div id="bgSlide" class="absolute inset-0 bg-cover bg-center" style="background-image: url('kegiatan1.jpg');"></div>
+    
+    <div class="absolute inset-0 bg-black bg-opacity-60 backdrop-blur-[2px]"></div>
+
+    <div class="bg-white/95 backdrop-blur-md p-8 rounded-3xl shadow-2xl w-full max-w-md text-center relative z-10">
       <img src="logo.png" alt="Logo Alam Damai" class="h-28 w-28 object-contain mx-auto mb-4 drop-shadow-md" onerror="this.style.display='none'">
-      
       <h2 class="text-2xl font-black text-blue-900 mb-2">Yayasan Alam Damai</h2>
-      <p class="text-gray-500 mb-6 text-sm">Masukkan password !</p>
+      <p class="text-gray-500 mb-6 text-sm font-medium">Masukkan password untuk masuk sistem</p>
       
-      <input type="password" id="passInput" placeholder="Password..." class="w-full p-4 border-2 border-gray-200 rounded-xl mb-4 text-center text-xl tracking-widest focus:border-blue-500 outline-none" onkeypress="if(event.key === 'Enter') checkPassword()">
-      <p id="passError" class="text-red-500 text-sm font-bold mb-4 hidden">Password Salah!</p>
+      <input type="password" id="passInput" placeholder="Password..." class="w-full p-4 border-2 border-gray-200 rounded-xl mb-4 text-center text-xl tracking-widest focus:border-blue-500 outline-none transition shadow-inner" onkeypress="if(event.key === 'Enter') checkPassword()">
+      <p id="passError" class="text-red-500 text-sm font-bold mb-4 hidden">Password Salah! Coba lagi.</p>
       
       <button onclick="checkPassword()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 rounded-xl transition shadow-lg text-lg">MASUK</button>
     </div>
@@ -195,6 +201,20 @@
     let currentIndex = -1;
     let targetIuranSaatIni = 10000;
 
+    // ==================== SLIDESHOW BACKGROUND LOGIC ====================
+    const bgImages = ['kegiatan1.jpg', 'kegiatan2.jpg', 'kegiatan3.jpg'];
+    let currentBgIndex = 0;
+    
+    setInterval(() => {
+      currentBgIndex = (currentBgIndex + 1) % bgImages.length;
+      const bgEl = document.getElementById('bgSlide');
+      if(bgEl) {
+        // Efek memudar dan mengganti foto tiap 4 detik
+        bgEl.style.backgroundImage = `url('${bgImages[currentBgIndex]}')`;
+      }
+    }, 4000);
+
+
     // ==================== SECURITY HASH (ANTI TRACE) ====================
     const TARGET_HASH = "bba7bc70b393649dfbdd4603e51804e1859e12369405ce1b5548c2b60c8be4ef";
     async function checkPassword() {
@@ -215,7 +235,6 @@
           main.style.opacity = '1';
           main.style.pointerEvents = 'auto';
           document.body.classList.remove('overflow-hidden');
-          // Kosongkan inputan password
           document.getElementById('passInput').value = ''; 
         }, 500);
       } else {
@@ -223,14 +242,13 @@
       }
     }
 
-    // FUNGSI LOCK APP (KEMBALI KE HOME)
     function lockApp() {
       const lockScreen = document.getElementById('lockScreen');
       const mainApp = document.getElementById('mainApp');
       const errorMsg = document.getElementById('passError');
 
       lockScreen.style.display = 'flex';
-      errorMsg.classList.add('hidden'); // Sembunyikan error lama
+      errorMsg.classList.add('hidden');
 
       setTimeout(() => {
         lockScreen.style.opacity = '1';
@@ -483,7 +501,7 @@
       }
     }
 
-    // ==================== FIX DOWNLOAD ACTION ====================
+    // ==================== FIX DOWNLOAD ACTION & PDF MASSAL (COMPRESSED) ====================
     
     function exportCSV() {
       if (rawData.length === 0) return alert("Tidak ada data untuk disimpan.");
@@ -502,7 +520,6 @@
       if (currentIndex === -1) return alert("Pilih kartu dulu di sebelah kiri!");
       try {
         const card = document.getElementById('cardPreview');
-        // KODE DIPERBAIKI: useCORS DICABUT AGAR TIDAK MUNCUL TAINTED CANVAS ERROR
         const canvas = await html2canvas(card, { scale: 2 });
         
         const link = document.createElement('a'); 
@@ -552,7 +569,7 @@
       const checkboxes = document.querySelectorAll('.dl-checkbox:checked');
       if(checkboxes.length === 0) return alert("Pilih minimal 1 keluarga!");
       const btn = document.getElementById('btnGeneratePDF');
-      btn.innerText = "⏳ Memproses..."; btn.disabled = true;
+      btn.innerText = "⏳ Memproses (Jangan ditutup)..."; btn.disabled = true;
       const originalIndex = currentIndex;
       const { jsPDF } = window.jspdf; let pdf = null;
       document.getElementById('previewContainer').classList.remove('hidden');
@@ -560,13 +577,18 @@
       for (let i = 0; i < checkboxes.length; i++) {
         currentIndex = parseInt(checkboxes[i].value); updateCardPreview();
         await new Promise(r => setTimeout(r, 200));
-        // KODE DIPERBAIKI: useCORS DICABUT AGAR TIDAK MUNCUL TAINTED CANVAS ERROR
-        const canvas = await html2canvas(document.getElementById('cardPreview'), { scale: 2 });
-        const imgData = canvas.toDataURL('image/png');
+        
+        // KOMPRESI PDF SUPER RINGAN! 
+        // Scale diturunkan ke 1.5 dan diubah ke JPEG 70% Quality
+        const canvas = await html2canvas(document.getElementById('cardPreview'), { scale: 1.5 });
+        const imgData = canvas.toDataURL('image/jpeg', 0.7); 
+        
         if (i === 0) pdf = new jsPDF({ orientation: 'landscape', unit: 'px', format: [canvas.width, canvas.height] });
         else pdf.addPage([canvas.width, canvas.height], 'landscape');
-        pdf.addImage(imgData, 'PNG', 0, 0, canvas.width, canvas.height);
+        
+        pdf.addImage(imgData, 'JPEG', 0, 0, canvas.width, canvas.height);
       }
+      
       if (originalIndex !== -1) { currentIndex = originalIndex; updateCardPreview(); kalkulasiTunggakan(currentIndex); }
       pdf.save(`Kartu_Iuran_Gabungan_${checkboxes.length}_Keluarga.pdf`);
       btn.innerText = "⏬ Unduh PDF Gabungan"; btn.disabled = false; closeModal('downloadModal');
