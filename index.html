@@ -3,244 +3,333 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Kartu Iuran Yayasan Alam Damai</title>
+  <title>Sistem Yayasan Alam Damai Pro</title>
   
   <script src="https://cdn.tailwindcss.com"></script>
-  
   <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
   <style>
-    /* Styling tabel kartu agar rapi dan tebal garisnya pas */
-    .card-table { 
-      border-collapse: collapse; 
-      width: 100%; 
-    }
-    .card-table th, .card-table td { 
-      border: 1px solid #18c3e1; 
-      padding: 6px 12px; 
-      text-align: center; 
-      font-size: 0.875rem; 
-    }
-    .card-table th { 
-      background-color: #e0f7fa; 
-      color: #0c4a6e; 
-      font-weight: 800; 
-      text-transform: uppercase;
-    }
-    .card-table td { 
-      font-weight: 500; 
-      color: #334155; 
-    }
-    
-    /* Efek bayangan untuk kartu agar realistis */
-    .print-card {
-      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
-      background-image: radial-gradient(#f8fafc 10%, transparent 10%);
-      background-size: 20px 20px;
-    }
-
-    /* Scrollbar minimalis untuk daftar keluarga */
-    .custom-scrollbar::-webkit-scrollbar {
-      width: 6px;
-    }
-    .custom-scrollbar::-webkit-scrollbar-track {
-      background: #f1f1f1;
-      border-radius: 10px;
-    }
-    .custom-scrollbar::-webkit-scrollbar-thumb {
-      background: #cbd5e1;
-      border-radius: 10px;
-    }
-    .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-      background: #94a3b8;
-    }
+    .card-table { border-collapse: collapse; width: 100%; }
+    .card-table th, .card-table td { border: 1px solid #18c3e1; padding: 6px 12px; text-align: center; font-size: 0.875rem; }
+    .card-table th { background-color: #e0f7fa; color: #0c4a6e; font-weight: 800; text-transform: uppercase; }
+    .card-table td { font-weight: 500; color: #334155; }
+    .print-card { box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1); background-image: radial-gradient(#f8fafc 10%, transparent 10%); background-size: 20px 20px; }
+    .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+    .custom-scrollbar::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 10px; }
+    .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
   </style>
 </head>
-<body class="bg-gray-100 min-h-screen text-gray-800 font-sans p-4 lg:p-8">
+<body class="bg-gray-100 min-h-screen text-gray-800 font-sans p-4 lg:p-8 overflow-hidden" id="mainBody">
 
-  <div class="max-w-7xl mx-auto flex flex-col lg:flex-row gap-6">
-    
-    <div id="adminPanel" class="w-full lg:w-1/3 bg-white p-6 rounded-2xl shadow-lg h-fit border-t-4 border-blue-500">
-      <h2 class="text-2xl font-black mb-6 text-blue-800 tracking-wide text-center">YAYASAN ALAM DAMAI</h2>
+  <div id="lockScreen" class="fixed inset-0 bg-blue-900 z-[100] flex flex-col items-center justify-center p-4 transition-opacity duration-500">
+    <div class="bg-white p-8 rounded-3xl shadow-2xl w-full max-w-md text-center">
       
-      <div class="flex flex-col gap-3 mb-6">
-        <button onclick="document.getElementById('csvFile').click()" class="w-full bg-blue-600 hover:bg-blue-700 text-white px-4 py-3 rounded-xl text-sm font-bold transition flex justify-center items-center gap-2 shadow-md">
-          📂 UPLOAD DATA CSV
-        </button>
-        <button onclick="exportCSV()" class="w-full bg-emerald-500 hover:bg-emerald-600 text-white px-4 py-3 rounded-xl text-sm font-bold transition flex justify-center items-center gap-2 shadow-md">
-          💾 SIMPAN/EXPORT CSV
-        </button>
-        <input type="file" id="csvFile" accept=".csv" class="hidden" onchange="loadCSV(event)">
+      <img src="logo.png" alt="Logo Alam Damai" class="h-28 w-28 object-contain mx-auto mb-4 drop-shadow-md" onerror="this.style.display='none'">
+      
+      <h2 class="text-2xl font-black text-blue-900 mb-2">Yayasan Alam Damai</h2>
+      <p class="text-gray-500 mb-6 text-sm">Masukkan password !</p>
+      
+      <input type="password" id="passInput" placeholder="Password..." class="w-full p-4 border-2 border-gray-200 rounded-xl mb-4 text-center text-xl tracking-widest focus:border-blue-500 outline-none" onkeypress="if(event.key === 'Enter') checkPassword()">
+      <p id="passError" class="text-red-500 text-sm font-bold mb-4 hidden">Password Salah!</p>
+      
+      <button onclick="checkPassword()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 rounded-xl transition shadow-lg text-lg">MASUK</button>
+    </div>
+  </div>
+
+  <div class="max-w-7xl mx-auto flex flex-col lg:flex-row gap-6 opacity-0 pointer-events-none transition-opacity duration-500 relative" id="mainApp">
+    
+    <button onclick="lockApp()" class="absolute -top-3 left-0 lg:-top-6 bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-xl font-bold shadow-md flex items-center gap-2 z-50 text-sm transition">
+      🔒 Kunci Aplikasi
+    </button>
+
+    <div id="adminPanel" class="w-full lg:w-1/3 flex flex-col gap-4 relative z-10 mt-8 lg:mt-6">
+      
+      <div class="bg-gradient-to-br from-blue-700 to-indigo-900 rounded-2xl shadow-lg p-6 text-white relative overflow-hidden">
+        <div class="absolute -right-4 -top-4 opacity-10 text-9xl">💰</div>
+        <p class="text-blue-100 font-bold mb-1 uppercase tracking-wider text-sm">Total Saldo</p>
+        <h3 id="saldoTotal" class="text-4xl font-black tracking-tight">Rp 0</h3>
       </div>
 
-      <div class="relative mb-4">
-        <input type="text" id="searchInput" placeholder="🔍 Cari nama keluarga atau anggota..." onkeyup="renderList()" class="w-full px-4 py-3 bg-gray-50 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-blue-500 focus:bg-white transition">
-      </div>
+      <div class="bg-white p-6 rounded-2xl shadow-lg h-fit border-t-4 border-blue-500">
+        <div class="flex flex-col gap-3 mb-6">
+          <button onclick="document.getElementById('csvFile').click()" class="w-full bg-blue-600 hover:bg-blue-700 text-white px-4 py-3 rounded-xl text-sm font-bold transition shadow-md">📂 UPLOAD CSV</button>
+          <button onclick="openAddModal()" class="w-full bg-purple-600 hover:bg-purple-700 text-white px-4 py-3 rounded-xl text-sm font-bold transition shadow-md">➕ TAMBAH KELUARGA BARU</button>
+          <button onclick="exportCSV()" class="w-full bg-emerald-500 hover:bg-emerald-600 text-white px-4 py-3 rounded-xl text-sm font-bold transition shadow-md">💾 SIMPAN/EXPORT CSV</button>
+          <input type="file" id="csvFile" accept=".csv" class="hidden" onchange="loadCSV(event)">
+        </div>
 
-      <div id="familyList" class="space-y-2 max-h-[55vh] overflow-y-auto pr-2 custom-scrollbar">
-        <div class="bg-blue-50 border border-blue-200 rounded-xl p-6 text-center mt-4">
-          <p class="text-blue-600 font-bold">BELUM ADA DATA</p>
-          <p class="text-blue-400 text-sm mt-1">Upload CSV nya dulu Mah !</p>
+        <input type="text" id="searchInput" placeholder="🔍 Cari No Kartu, Nama, atau Anggota..." onkeyup="renderList()" class="w-full px-4 py-3 bg-gray-50 border-2 border-gray-200 rounded-xl focus:outline-none focus:border-blue-500 transition mb-4">
+
+        <div id="familyList" class="space-y-2 max-h-[50vh] overflow-y-auto pr-2 custom-scrollbar">
+          <div class="bg-blue-50 border border-blue-200 rounded-xl p-6 text-center mt-4">
+            <p class="text-blue-600 font-bold">BELUM ADA DATA</p>
+            <p class="text-blue-400 text-sm mt-1">Upload CSV nya dulu Mah !</p>
+          </div>
         </div>
       </div>
     </div>
 
-    <div id="previewPanel" class="w-full lg:w-2/3 flex flex-col gap-4">
+    <div id="previewPanel" class="w-full lg:w-2/3 flex flex-col gap-4 mt-8 lg:mt-6">
       
-      <div id="actionButtons" class="bg-white p-4 rounded-2xl shadow-lg flex flex-wrap justify-center gap-3 hidden border-t-4 border-yellow-400">
-        <button onclick="openEditModal()" class="bg-yellow-500 hover:bg-yellow-600 text-white px-6 py-2.5 rounded-xl font-bold transition shadow">✏️ Edit Pembayaran</button>
-        <button onclick="toggleFullScreen()" class="bg-blue-600 hover:bg-blue-700 text-white px-6 py-2.5 rounded-xl font-bold transition shadow flex items-center gap-1">📱 Full Screen (SS)</button>
-        <button onclick="downloadPNG()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-2.5 rounded-xl font-bold transition shadow">🖼️ Download PNG</button>
-        <button onclick="downloadPDF()" class="bg-red-600 hover:bg-red-700 text-white px-6 py-2.5 rounded-xl font-bold transition shadow">📄 Download PDF</button>
+      <div id="infoTagihan" class="bg-white rounded-2xl shadow-lg p-5 flex items-center justify-between border-l-8 border-gray-300 hidden">
+        <div>
+          <h3 class="font-black text-gray-800 text-lg mb-1" id="lblStatusTunggakan">Status: Menghitung...</h3>
+          <p class="text-sm font-medium text-gray-500" id="lblDetailWajib">Wajib Iuran: -</p>
+        </div>
+        <div class="text-right">
+          <p class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-1">Total Tunggakan</p>
+          <p class="text-2xl font-black text-red-600" id="lblNominalTunggakan">Rp 0</p>
+        </div>
       </div>
 
-      <div class="overflow-x-auto bg-gray-300 p-6 rounded-2xl shadow-inner flex flex-col items-center justify-center hidden relative transition-all duration-300" id="previewContainer">
-        
-        <button id="exitFullScreenBtn" onclick="toggleFullScreen()" class="hidden mb-4 bg-red-600 hover:bg-red-700 text-white px-6 py-2 rounded-xl font-bold shadow transition z-50 sticky top-0">
-          ❌ Keluar Mode Full Screen
-        </button>
+      <div id="actionButtons" class="bg-white p-4 rounded-2xl shadow-lg flex flex-wrap justify-center gap-3 hidden border-t-4 border-yellow-400">
+        <button onclick="openEditModal()" class="bg-yellow-500 hover:bg-yellow-600 text-white px-5 py-2.5 rounded-xl font-bold shadow">✏️ Edit Pembayaran</button>
+        <button onclick="toggleFullScreen()" class="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-xl font-bold shadow">📱 Full Screen (SS)</button>
+        <button onclick="downloadPNG()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2.5 rounded-xl font-bold shadow">🖼️ Download 1 PNG</button>
+        <button onclick="openDownloadModal()" class="bg-red-600 hover:bg-red-700 text-white px-5 py-2.5 rounded-xl font-bold shadow">📄 Download PDF Massal</button>
+      </div>
 
+      <div class="overflow-x-auto bg-gray-300 p-6 rounded-2xl shadow-inner flex flex-col items-center justify-center hidden transition-all duration-300" id="previewContainer">
+        <button id="exitFullScreenBtn" onclick="toggleFullScreen()" class="hidden mb-4 bg-red-600 text-white px-6 py-2 rounded-xl font-bold shadow transition z-50 sticky top-0">❌ Keluar Full Screen</button>
+        
         <div id="cardPreview" class="print-card bg-white w-[850px] min-w-[850px] p-10 rounded-xl border-[6px] border-blue-500 relative">
-          
           <div class="flex items-center justify-between border-b-[3px] border-blue-500 pb-5 mb-6">
             <img src="logo.png" alt="Logo" class="h-24 w-24 object-contain" onerror="this.style.display='none'">
-            
             <div class="text-center flex-1">
               <h1 class="text-4xl font-black text-blue-800 uppercase tracking-[0.2em] mb-1">Kartu Iuran</h1>
               <h2 class="text-2xl font-bold text-gray-700 tracking-wide">YAYASAN ALAM DAMAI</h2>
             </div>
-            
             <div class="w-24"></div>
           </div>
-
           <div class="grid grid-cols-12 gap-y-2 gap-x-4 mb-6 text-base px-2">
-            <div class="col-span-2 font-bold text-gray-700">No. Kartu</div>
-            <div class="col-span-10 font-semibold text-blue-900">: <span id="lblNoKartu"></span></div>
-
-            <div class="col-span-2 font-bold text-gray-700">No. Telepon</div>
-            <div class="col-span-10 font-semibold text-blue-900">: <span id="lblNoTelp"></span></div>
-            
-            <div class="col-span-2 font-bold text-gray-700">Nama</div>
-            <div class="col-span-10 font-semibold text-blue-900">: <span id="lblNama"></span></div>
-            
-            <div class="col-span-2 font-bold text-gray-700">Alamat</div>
-            <div class="col-span-10 font-semibold text-blue-900">: <span id="lblAlamat"></span></div>
-            
-            <div class="col-span-2 font-bold text-gray-700">Anggota</div>
-            <div class="col-span-10 font-semibold text-blue-900">: <span id="lblAnggota"></span></div>
+            <div class="col-span-2 font-bold text-gray-700">No. Kartu</div><div class="col-span-10 font-semibold text-blue-900">: <span id="lblNoKartu"></span></div>
+            <div class="col-span-2 font-bold text-gray-700">No. Telepon</div><div class="col-span-10 font-semibold text-blue-900">: <span id="lblNoTelp"></span></div>
+            <div class="col-span-2 font-bold text-gray-700">Nama</div><div class="col-span-10 font-semibold text-blue-900">: <span id="lblNama"></span></div>
+            <div class="col-span-2 font-bold text-gray-700">Alamat</div><div class="col-span-10 font-semibold text-blue-900">: <span id="lblAlamat"></span></div>
+            <div class="col-span-2 font-bold text-gray-700">Anggota</div><div class="col-span-10 font-semibold text-blue-900">: <span id="lblAnggota"></span></div>
           </div>
-
-          <table class="card-table mb-8 bg-white">
-            <thead>
-              <tr>
-                <th class="w-1/4 py-3">Bulan</th>
-                <th class="w-1/4 py-3">Tahun 2026</th>
-                <th class="w-1/4 py-3">Tahun 2027</th>
-                <th class="w-1/4 py-3">Tahun 2028</th>
-              </tr>
-            </thead>
-            <tbody id="tableBody">
-              </tbody>
-          </table>
+          <table class="card-table mb-8 bg-white"><tbody id="tableBody"></tbody></table>
 
           <div class="flex justify-between text-center mt-4 px-10">
             <div class="flex flex-col items-center">
               <p class="font-bold text-gray-800 mb-2">KETUA</p>
-              <div class="h-20 flex items-center justify-center">
-                <img src="tt_ketua.png" alt="TT Ketua" class="max-h-full object-contain" onerror="this.style.display='none'">
-              </div>
+              <div class="h-20 flex items-center justify-center"><img src="tt_ketua.png" class="max-h-full object-contain" onerror="this.style.display='none'"></div>
               <p class="underline font-bold text-gray-800 mt-2">( Bpk. Manullang )</p>
             </div>
-            
             <div class="flex flex-col items-center">
               <p class="font-bold text-gray-800 mb-2">SEKRETARIS</p>
-              <div class="h-20 flex items-center justify-center">
-                <img src="tt_sekretaris.png" alt="TT Sekretaris" class="max-h-full object-contain" onerror="this.style.display='none'">
-              </div>
+              <div class="h-20 flex items-center justify-center"><img src="tt_sekretaris.png" class="max-h-full object-contain" onerror="this.style.display='none'"></div>
               <p class="underline font-bold text-gray-800 mt-2">( Ibu Lucy )</p>
             </div>
-            
             <div class="flex flex-col items-center">
               <p class="font-bold text-gray-800 mb-2">BENDAHARA</p>
-              <div class="h-20 flex items-center justify-center">
-                <img src="tt_bendahara.png" alt="TT Bendahara" class="max-h-full object-contain" onerror="this.style.display='none'">
-              </div>
+              <div class="h-20 flex items-center justify-center"><img src="tt_bendahara.png" class="max-h-full object-contain" onerror="this.style.display='none'"></div>
               <p class="underline font-bold text-gray-800 mt-2">( Ibu Suzan )</p>
             </div>
           </div>
-
         </div>
       </div>
-
     </div>
   </div>
 
-  <div id="editModal" class="fixed inset-0 bg-black bg-opacity-60 backdrop-blur-sm flex items-center justify-center hidden z-50 p-4">
+  <div id="editModal" class="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center hidden z-[70] p-4">
     <div class="bg-white rounded-2xl shadow-2xl p-6 lg:p-8 w-full max-w-4xl max-h-[90vh] flex flex-col">
       <h2 class="text-2xl font-black text-blue-800 mb-4 border-b-2 border-gray-100 pb-4">Edit Pembayaran</h2>
-      
       <div class="overflow-y-auto flex-1 pr-2 space-y-5 custom-scrollbar">
         <div class="bg-blue-50 p-4 rounded-xl border border-blue-100">
           <label class="block text-sm font-bold text-blue-800 mb-1">Nama Keluarga</label>
-          <input type="text" id="editNama" class="w-full border-2 border-blue-200 rounded-lg px-4 py-2 bg-white font-semibold text-gray-700 outline-none focus:border-blue-500">
+          <input type="text" id="editNama" class="w-full border-2 border-blue-200 rounded-lg px-4 py-2 bg-white font-semibold text-gray-700 outline-none">
         </div>
-        
         <div>
-          <h3 class="font-bold text-gray-800 flex items-center gap-2">
-            📅 Set Tanggal & Nominal Pembayaran
-          </h3>
-          <p class="text-sm text-gray-500 mb-4 mt-1">Kosongkan jika belum bayar. Jika bayar, isi tanggal dan nominal uangnya. (Misal: 40000)</p>
-          
-          <div id="editMonthsContainer" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4">
-            </div>
+          <h3 class="font-bold text-gray-800 flex items-center gap-2">📅 Set Tanggal & Nominal Pembayaran</h3>
+          <p class="text-sm text-gray-500 mb-4 mt-1">Kosongkan jika belum bayar. Nominal standar otomatis terisi sesuai jumlah anggota.</p>
+          <div id="editMonthsContainer" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4"></div>
         </div>
       </div>
-
       <div class="mt-8 flex justify-end gap-3 pt-5 border-t-2 border-gray-100">
-        <button onclick="closeModal()" class="px-6 py-2.5 bg-gray-200 hover:bg-gray-300 text-gray-700 rounded-xl font-bold transition">Batal</button>
+        <button onclick="closeModal('editModal')" class="px-6 py-2.5 bg-gray-200 hover:bg-gray-300 rounded-xl font-bold transition">Batal</button>
         <button onclick="saveChanges()" class="px-6 py-2.5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-bold transition shadow-md">Simpan Perubahan</button>
       </div>
     </div>
   </div>
 
+  <div id="addModal" class="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center hidden z-[70] p-4">
+    <div class="bg-white rounded-2xl shadow-2xl p-6 w-full max-w-lg">
+      <h2 class="text-xl font-black mb-4 text-blue-800">➕ Tambah Keluarga Baru</h2>
+      <div class="space-y-3">
+        <input type="text" id="addNoKartu" disabled class="w-full p-3 border rounded-xl bg-gray-100 font-bold" placeholder="No Kartu Otomatis">
+        <input type="text" id="addNama" placeholder="Nama Keluarga (Contoh: Bpk Asep (4))" class="w-full p-3 border rounded-xl focus:border-blue-500 outline-none">
+        <input type="text" id="addAlamat" placeholder="Alamat" class="w-full p-3 border rounded-xl focus:border-blue-500 outline-none">
+        <input type="text" id="addTelp" placeholder="No Telepon" class="w-full p-3 border rounded-xl focus:border-blue-500 outline-none">
+        <input type="text" id="addAnggota" placeholder="Daftar Anggota (pisahkan koma)" class="w-full p-3 border rounded-xl focus:border-blue-500 outline-none">
+      </div>
+      <div class="mt-6 flex gap-3">
+        <button onclick="closeModal('addModal')" class="flex-1 bg-gray-200 py-3 rounded-xl font-bold">Batal</button>
+        <button onclick="saveNewFamily()" class="flex-1 bg-blue-600 text-white py-3 rounded-xl font-bold">Simpan Keluarga</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="downloadModal" class="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center hidden z-[70] p-4">
+    <div class="bg-white rounded-2xl shadow-2xl p-6 w-full max-w-2xl max-h-[90vh] flex flex-col">
+      <h2 class="text-2xl font-black text-red-700 mb-2 border-b-2 border-gray-100 pb-4">📄 Pilih Kartu untuk PDF</h2>
+      <input type="text" id="searchDownload" placeholder="🔍 Cari nama / anggota..." onkeyup="renderDownloadList()" class="w-full px-4 py-3 bg-gray-50 border-2 rounded-xl mb-3 focus:outline-none">
+      <div class="flex items-center mb-2 px-2 bg-red-50 p-2 rounded-lg border border-red-200">
+          <input type="checkbox" id="selectAllDl" onchange="toggleSelectAllDl()" class="w-5 h-5 mr-3 cursor-pointer accent-red-600">
+          <label for="selectAllDl" class="font-bold text-red-800 cursor-pointer">Pilih Semua yang Tampil</label>
+      </div>
+      <div id="downloadListContainer" class="overflow-y-auto flex-1 pr-2 space-y-2 custom-scrollbar border rounded-xl p-3 bg-white"></div>
+      <div class="mt-6 flex justify-end gap-3 pt-5 border-t-2 border-gray-100">
+        <button onclick="closeModal('downloadModal')" class="px-6 py-2.5 bg-gray-200 rounded-xl font-bold">Batal</button>
+        <button id="btnGeneratePDF" onclick="generateMultiPDF()" class="px-6 py-2.5 bg-red-600 hover:bg-red-700 text-white rounded-xl font-bold shadow-md flex items-center gap-2">⏬ Unduh PDF Gabungan</button>
+      </div>
+    </div>
+  </div>
+
   <script>
+    const listBulan = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
     let rawData = [];
     let headers = [];
     let currentIndex = -1;
+    let targetIuranSaatIni = 10000;
 
-    const listBulan = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
+    // ==================== SECURITY HASH (ANTI TRACE) ====================
+    const TARGET_HASH = "bba7bc70b393649dfbdd4603e51804e1859e12369405ce1b5548c2b60c8be4ef";
+    async function checkPassword() {
+      const input = document.getElementById('passInput').value;
+      const errorMsg = document.getElementById('passError');
+      
+      const encoder = new TextEncoder();
+      const data = encoder.encode(input);
+      const hashBuffer = await crypto.subtle.digest('SHA-256', data);
+      const hashArray = Array.from(new Uint8Array(hashBuffer));
+      const hashHex = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
 
+      if (hashHex === TARGET_HASH) {
+        document.getElementById('lockScreen').style.opacity = '0';
+        setTimeout(() => {
+          document.getElementById('lockScreen').style.display = 'none';
+          const main = document.getElementById('mainApp');
+          main.style.opacity = '1';
+          main.style.pointerEvents = 'auto';
+          document.body.classList.remove('overflow-hidden');
+          // Kosongkan inputan password
+          document.getElementById('passInput').value = ''; 
+        }, 500);
+      } else {
+        errorMsg.classList.remove('hidden');
+      }
+    }
+
+    // FUNGSI LOCK APP (KEMBALI KE HOME)
+    function lockApp() {
+      const lockScreen = document.getElementById('lockScreen');
+      const mainApp = document.getElementById('mainApp');
+      const errorMsg = document.getElementById('passError');
+
+      lockScreen.style.display = 'flex';
+      errorMsg.classList.add('hidden'); // Sembunyikan error lama
+
+      setTimeout(() => {
+        lockScreen.style.opacity = '1';
+        mainApp.style.opacity = '0';
+        mainApp.style.pointerEvents = 'none';
+        document.body.classList.add('overflow-hidden');
+      }, 50);
+    }
+
+    // ==================== CORE LOGIC ====================
     function loadCSV(event) {
-      const file = event.target.files[0];
-      if (!file) return;
-
-      Papa.parse(file, {
-        header: true,
-        skipEmptyLines: true,
+      if (!event.target.files[0]) return;
+      Papa.parse(event.target.files[0], {
+        header: true, skipEmptyLines: true,
         complete: function(results) {
           rawData = results.data;
           headers = results.meta.fields;
           renderList();
+          hitungSaldoGlobal();
         }
       });
     }
 
-    // FITUR BARU: PENCARIAN CERDAS MENCAKUP NAMA KELUARGA & ANGOTA KELUARGA
+    function hitungSaldoGlobal() {
+      let totalSaldo = 0;
+      rawData.forEach(row => {
+        headers.forEach(h => {
+          if (h.includes('_202')) {
+            let val = row[h] || '';
+            let nominal = val;
+            if (val.includes('|')) nominal = val.split('|')[1];
+            if (nominal && !isNaN(parseInt(nominal))) {
+              totalSaldo += parseInt(nominal);
+            }
+          }
+        });
+      });
+      document.getElementById('saldoTotal').innerText = "Rp " + totalSaldo.toLocaleString('id-ID');
+    }
+
+    function kalkulasiTunggakan(index) {
+      const data = rawData[index];
+      const namaLengkap = data.Nama_Keluarga || '';
+      
+      const match = namaLengkap.match(/\((\d+)\)/);
+      const jumlahOrang = match ? parseInt(match[1]) : 1;
+      targetIuranSaatIni = jumlahOrang * 10000;
+
+      const currentDate = new Date();
+      const currentMonthStr = listBulan[currentDate.getMonth()];
+      const currentYearStr = currentDate.getFullYear();
+      const headerSaatIni = `${currentMonthStr}_${currentYearStr}`;
+
+      let bulanNunggak = 0;
+      let lewatBulanIni = false;
+
+      headers.forEach(h => {
+        if (!h.includes('_202') || lewatBulanIni) return;
+        let val = data[h] || '';
+        if (val === '') bulanNunggak++;
+        if (h === headerSaatIni) lewatBulanIni = true;
+      });
+
+      const totalTunggakan = bulanNunggak * targetIuranSaatIni;
+      const box = document.getElementById('infoTagihan');
+      const lblWajib = document.getElementById('lblDetailWajib');
+      const lblStatus = document.getElementById('lblStatusTunggakan');
+      const lblTotal = document.getElementById('lblNominalTunggakan');
+
+      box.classList.remove('hidden');
+      lblWajib.innerText = `Wajib Iuran: Rp ${targetIuranSaatIni.toLocaleString('id-ID')}/Bulan (${jumlahOrang} Orang)`;
+
+      if (bulanNunggak > 0) {
+        box.className = "bg-red-50 rounded-2xl shadow-lg p-5 flex items-center justify-between border-l-8 border-red-500 mb-4";
+        lblStatus.innerText = `⚠️ Menunggak ${bulanNunggak} Bulan`;
+        lblStatus.className = "font-black text-red-800 text-lg mb-1";
+        lblTotal.innerText = `Rp ${totalTunggakan.toLocaleString('id-ID')}`;
+        lblTotal.className = "text-2xl font-black text-red-600";
+      } else {
+        box.className = "bg-green-50 rounded-2xl shadow-lg p-5 flex items-center justify-between border-l-8 border-green-500 mb-4";
+        lblStatus.innerText = `✅ Lunas (Aman)`;
+        lblStatus.className = "font-black text-green-800 text-lg mb-1";
+        lblTotal.innerText = `Rp 0`;
+        lblTotal.className = "text-2xl font-black text-green-600";
+      }
+    }
+
     function renderList() {
       const listContainer = document.getElementById('familyList');
       const search = document.getElementById('searchInput').value.toLowerCase();
       listContainer.innerHTML = '';
-
       let hasResult = false;
 
       rawData.forEach((row, index) => {
-        const namaKeluarga = row.Nama_Keluarga ? row.Nama_Keluarga.toLowerCase() : '';
-        const anggotaKeluarga = row.Anggota ? row.Anggota.toLowerCase() : '';
+        const noKartu = (row.No_Kartu || '').toLowerCase();
+        const namaKeluarga = (row.Nama_Keluarga || '').toLowerCase();
+        const anggotaKeluarga = (row.Anggota || '').toLowerCase();
 
-        // Cek jika nama keluarga ATAU teks anggota mengandung kata kunci pencarian
-        if (namaKeluarga.includes(search) || anggotaKeluarga.includes(search)) {
+        if (noKartu.includes(search) || namaKeluarga.includes(search) || anggotaKeluarga.includes(search)) {
           hasResult = true;
           const div = document.createElement('div');
           div.className = "p-4 border-2 rounded-xl cursor-pointer transition shadow-sm " + 
@@ -253,18 +342,14 @@
                   <span class="bg-blue-100 text-blue-800 px-2 py-0.5 rounded text-xs mr-1">No. ${row.No_Kartu}</span> 
                   ${row.Nama_Keluarga}
                 </p>
-                <p class="text-xs text-gray-500 line-clamp-1">📍 ${row.Alamat}</p>
-                <p class="text-[11px] text-blue-600 mt-1 italic line-clamp-1 font-medium">👥 Anggota: ${row.Anggota || '-'}</p>
+                <p class="text-[11px] text-blue-600 mt-1 italic font-medium">👥 Anggota: ${row.Anggota || '-'}</p>
               </div>
             </div>`;
           div.onclick = () => selectFamily(index);
           listContainer.appendChild(div);
         }
       });
-
-      if (!hasResult && rawData.length > 0) {
-        listContainer.innerHTML = `<p class="text-gray-400 text-sm italic text-center mt-10">Data tidak ditemukan.</p>`;
-      }
+      if (!hasResult && rawData.length > 0) listContainer.innerHTML = `<p class="text-gray-400 text-sm italic text-center mt-10">Data tidak ditemukan.</p>`;
     }
 
     function selectFamily(index) {
@@ -272,16 +357,16 @@
       renderList(); 
       document.getElementById('actionButtons').classList.remove('hidden');
       document.getElementById('previewContainer').classList.remove('hidden');
+      kalkulasiTunggakan(index);
       updateCardPreview();
     }
 
-    // UPDATE PREVIEW (MENAMPILKAN FORMAT DAN NO TELEPON BARU)
     function updateCardPreview() {
       if (currentIndex === -1) return;
       const data = rawData[currentIndex];
 
       document.getElementById('lblNoKartu').innerText = data.No_Kartu || '-';
-      document.getElementById('lblNoTelp').innerText = data.No_Telp || '-'; // Render nomor telepon
+      document.getElementById('lblNoTelp').innerText = data.No_Telp || '-';
       document.getElementById('lblNama').innerText = data.Nama_Keluarga || '-';
       document.getElementById('lblAlamat').innerText = data.Alamat || '-';
       document.getElementById('lblAnggota').innerText = data.Anggota || '-';
@@ -291,43 +376,24 @@
 
       listBulan.forEach(bulan => {
         const tr = document.createElement('tr');
-        
         const tdBulan = document.createElement('td');
-        tdBulan.innerText = bulan;
-        tdBulan.className = "font-bold bg-gray-50 text-left text-blue-900";
-        tr.appendChild(tdBulan);
+        tdBulan.innerText = bulan; tdBulan.className = "font-bold bg-gray-50 text-left text-blue-900"; tr.appendChild(tdBulan);
 
         [2026, 2027, 2028].forEach(tahun => {
-          const colKey = `${bulan}_${tahun}`;
-          const td = document.createElement('td');
-          
+          const colKey = `${bulan}_${tahun}`; const td = document.createElement('td');
           if (headers.includes(colKey)) {
-            let val = data[colKey] || '';
-            let tanggal = '';
-            let nominal = val;
-
-            if (val.includes('|')) {
-              const parts = val.split('|');
-              tanggal = parts[0];
-              nominal = parts[1];
-            }
+            let val = data[colKey] || ''; let tanggal = ''; let nominal = val;
+            if (val.includes('|')) { const parts = val.split('|'); tanggal = parts[0]; nominal = parts[1]; }
 
             if (tanggal && nominal) {
-              const dateObj = new Date(tanggal);
-              const tgl = dateObj.getDate();
-              const bln = dateObj.getMonth() + 1;
+              const dateObj = new Date(tanggal); const tgl = dateObj.getDate(); const bln = dateObj.getMonth() + 1;
               td.innerHTML = `<span class="font-extrabold text-blue-700 bg-blue-50 px-1 py-1 rounded text-xs">(${tgl}/${bln}) Rp.${nominal}</span>`;
             } else if (nominal !== '') {
               td.innerHTML = `<span class="text-green-600 font-bold text-xs">Lunas<br>(Rp ${nominal})</span>`;
-            } else {
-              td.innerHTML = `<span class="text-gray-300">-</span>`;
-            }
-          } else {
-            td.innerHTML = `<span class="bg-gray-100 block w-full h-full text-transparent">-</span>`;
-          }
+            } else { td.innerHTML = `-`; }
+          } else { td.innerHTML = `<span class="bg-gray-100 block w-full h-full text-transparent">-</span>`; }
           tr.appendChild(td);
         });
-
         tbody.appendChild(tr);
       });
     }
@@ -335,7 +401,6 @@
     function openEditModal() {
       if (currentIndex === -1) return;
       const data = rawData[currentIndex];
-      
       document.getElementById('editNama').value = data.Nama_Keluarga;
       const container = document.getElementById('editMonthsContainer');
       container.innerHTML = '';
@@ -345,137 +410,166 @@
           const div = document.createElement('div');
           div.className = "flex flex-col border-2 border-gray-100 p-3 rounded-xl bg-gray-50 focus-within:border-blue-400 focus-within:bg-white transition";
           
-          const label = document.createElement('label');
-          label.className = "text-xs font-bold mb-2 text-gray-600 uppercase tracking-wide";
-          label.innerText = h.replace('_', ' ');
+          const label = document.createElement('label'); label.className = "text-xs font-bold mb-2 text-gray-600 uppercase"; label.innerText = h.replace('_', ' ');
+          const inputDate = document.createElement('input'); inputDate.type = "date"; inputDate.className = "text-sm border rounded-lg p-1.5 mb-2 outline-none w-full"; inputDate.id = `input_date_${h}`;
           
-          // Input Kalender
-          const inputDate = document.createElement('input');
-          inputDate.type = "date";
-          inputDate.className = "text-sm bg-white border border-gray-300 rounded-lg p-1.5 mb-2 outline-none font-semibold text-blue-900 cursor-pointer w-full focus:border-blue-500";
-          inputDate.id = `input_date_${h}`;
+          const inputNominal = document.createElement('input'); inputNominal.type = "number"; 
+          inputNominal.placeholder = `Rp ${targetIuranSaatIni}`; 
+          inputNominal.className = "text-sm border rounded-lg p-1.5 outline-none font-semibold text-green-700 w-full"; inputNominal.id = `input_nom_${h}`;
           
-          // Input Angka Uang
-          const inputNominal = document.createElement('input');
-          inputNominal.type = "number";
-          inputNominal.placeholder = "Isi Rp... (Cth: 40000)";
-          inputNominal.className = "text-sm bg-white border border-gray-300 rounded-lg p-1.5 outline-none font-semibold text-green-700 w-full focus:border-green-500";
-          inputNominal.id = `input_nom_${h}`;
-          
-          let cellVal = data[h] || '';
-          let dateVal = '';
-          let nomVal = cellVal;
+          let cellVal = data[h] || ''; let dateVal = ''; let nomVal = cellVal;
+          if (cellVal.includes('|')) { const parts = cellVal.split('|'); dateVal = parts[0]; nomVal = parts[1]; }
 
-          if (cellVal.includes('|')) {
-            const parts = cellVal.split('|');
-            dateVal = parts[0];
-            nomVal = parts[1];
-          }
-
-          inputDate.value = dateVal;
-          inputNominal.value = nomVal;
-
-          div.appendChild(label);
-          div.appendChild(inputDate);
-          div.appendChild(inputNominal);
-          container.appendChild(div);
+          inputDate.value = dateVal; inputNominal.value = nomVal;
+          div.appendChild(label); div.appendChild(inputDate); div.appendChild(inputNominal); container.appendChild(div);
         }
       });
-
       document.getElementById('editModal').classList.remove('hidden');
-    }
-
-    function closeModal() {
-      document.getElementById('editModal').classList.add('hidden');
     }
 
     function saveChanges() {
       const data = rawData[currentIndex];
       data.Nama_Keluarga = document.getElementById('editNama').value;
-
       headers.forEach(h => {
         if (h.includes('_202')) {
           const inputDateVal = document.getElementById(`input_date_${h}`).value;
           const inputNomVal = document.getElementById(`input_nom_${h}`).value;
-
-          if (inputDateVal && inputNomVal) {
-            data[h] = `${inputDateVal}|${inputNomVal}`;
-          } else if (inputNomVal) {
-            data[h] = inputNomVal;
-          } else {
-            data[h] = '';
-          }
+          if (inputDateVal && inputNomVal) data[h] = `${inputDateVal}|${inputNomVal}`;
+          else if (inputNomVal) data[h] = inputNomVal;
+          else data[h] = '';
         }
       });
-
-      closeModal();
+      closeModal('editModal');
       updateCardPreview();
-      alert('Tersimpan! Jangan lupa klik "SIMPAN/EXPORT CSV" supaya tanggal & nominal ini tidak hilang bulan depan.');
+      hitungSaldoGlobal(); 
+      kalkulasiTunggakan(currentIndex); 
     }
 
-    // MODUS LAYAR PENUH (FULLSCREEN OVERLAY) BIAR SCREENSHOT RAPI & BERSIH DI IPAD/HP
+    function openAddModal() {
+      if (rawData.length === 0) return alert("Upload CSV dulu!");
+      const maxNo = Math.max(...rawData.map(r => parseInt(r.No_Kartu) || 0));
+      document.getElementById('addNoKartu').value = maxNo + 1;
+      document.getElementById('addModal').classList.remove('hidden');
+    }
+
+    function saveNewFamily() {
+      const newFam = {};
+      headers.forEach(h => newFam[h] = ''); 
+      
+      newFam.No_Kartu = document.getElementById('addNoKartu').value;
+      newFam.Nama_Keluarga = document.getElementById('addNama').value;
+      newFam.Alamat = document.getElementById('addAlamat').value;
+      newFam.No_Telp = document.getElementById('addTelp').value;
+      newFam.Anggota = document.getElementById('addAnggota').value;
+      
+      rawData.push(newFam);
+      renderList();
+      closeModal('addModal');
+      alert("Keluarga baru berhasil ditambahkan!");
+    }
+
+    function closeModal(modalId) { document.getElementById(modalId).classList.add('hidden'); }
+
     function toggleFullScreen() {
       const container = document.getElementById('previewContainer');
       const exitBtn = document.getElementById('exitFullScreenBtn');
-      
+      const adminPanel = document.getElementById('adminPanel');
       if (container.classList.contains('fixed')) {
-        // Balik ke normal
-        container.className = "overflow-x-auto bg-gray-300 p-6 rounded-2xl shadow-inner flex flex-col items-center justify-center";
-        exitBtn.classList.add('hidden');
-        document.body.classList.remove('overflow-hidden');
+        container.className = "overflow-x-auto bg-gray-300 p-6 rounded-2xl shadow-inner flex flex-col items-center justify-center relative transition-all duration-300";
+        exitBtn.classList.add('hidden'); adminPanel.style.display = "flex"; document.body.classList.remove('overflow-hidden');
       } else {
-        // Menjadi Overlay Full Layar
-        container.className = "fixed inset-0 bg-gray-900 z-50 p-6 flex flex-col items-center justify-start overflow-y-auto";
-        exitBtn.classList.remove('hidden');
-        document.body.classList.add('overflow-hidden');
+        container.className = "fixed inset-0 bg-gray-900 z-[80] p-6 flex flex-col items-center justify-start overflow-y-auto";
+        exitBtn.classList.remove('hidden'); adminPanel.style.display = "none"; document.body.classList.add('overflow-hidden');
       }
     }
 
+    // ==================== FIX DOWNLOAD ACTION ====================
+    
     function exportCSV() {
-      if (rawData.length === 0) return alert('Tidak ada data untuk di-export');
+      if (rawData.length === 0) return alert("Tidak ada data untuk disimpan.");
       const csv = Papa.unparse(rawData);
       const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
-      const link = document.createElement("a");
-      const url = URL.createObjectURL(blob);
-      link.setAttribute("href", url);
-      link.setAttribute("download", "Data-Iuran-Update.csv");
-      link.style.visibility = 'hidden';
+      const link = document.createElement("a"); 
+      link.href = URL.createObjectURL(blob);
+      link.download = "Data-Iuran-Update.csv"; 
+      
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
     }
-
+    
     async function downloadPNG() {
-      const card = document.getElementById('cardPreview');
+      if (currentIndex === -1) return alert("Pilih kartu dulu di sebelah kiri!");
       try {
+        const card = document.getElementById('cardPreview');
+        // KODE DIPERBAIKI: useCORS DICABUT AGAR TIDAK MUNCUL TAINTED CANVAS ERROR
         const canvas = await html2canvas(card, { scale: 2 });
-        const link = document.createElement('a');
+        
+        const link = document.createElement('a'); 
         link.download = `Kartu_Iuran_${rawData[currentIndex].No_Kartu}.png`;
-        link.href = canvas.toDataURL('image/png');
+        link.href = canvas.toDataURL('image/png'); 
+        
+        document.body.appendChild(link);
         link.click();
+        document.body.removeChild(link);
       } catch (error) {
-        alert('Gagal membuat PNG: ' + error.message);
+        alert("Gagal mendownload PNG. Error: " + error.message);
       }
     }
 
-    async function downloadPDF() {
-      const card = document.getElementById('cardPreview');
-      try {
-        const canvas = await html2canvas(card, { scale: 2 });
+    function openDownloadModal() {
+      if(rawData.length === 0) return alert("Silakan upload CSV dulu Mah!");
+      document.getElementById('downloadModal').classList.remove('hidden');
+      document.getElementById('searchDownload').value = '';
+      document.getElementById('selectAllDl').checked = false;
+      renderDownloadList();
+    }
+
+    function renderDownloadList() {
+      const container = document.getElementById('downloadListContainer');
+      const search = document.getElementById('searchDownload').value.toLowerCase();
+      container.innerHTML = '';
+      rawData.forEach((row, index) => {
+        if ((row.Nama_Keluarga||'').toLowerCase().includes(search) || (row.Anggota||'').toLowerCase().includes(search)) {
+          const div = document.createElement('div');
+          div.className = "flex items-center p-3 border-b border-gray-100 hover:bg-red-50";
+          div.innerHTML = `
+            <input type="checkbox" id="dl_${index}" value="${index}" class="dl-checkbox w-5 h-5 mr-4 cursor-pointer accent-red-600">
+            <label for="dl_${index}" class="cursor-pointer flex-1 text-gray-700">
+              <span class="font-bold text-red-700 mr-2">[No. ${row.No_Kartu}]</span> <span class="font-semibold">${row.Nama_Keluarga}</span>
+            </label>`;
+          container.appendChild(div);
+        }
+      });
+    }
+
+    function toggleSelectAllDl() {
+      const isChecked = document.getElementById('selectAllDl').checked;
+      document.querySelectorAll('.dl-checkbox').forEach(cb => cb.checked = isChecked);
+    }
+
+    async function generateMultiPDF() {
+      const checkboxes = document.querySelectorAll('.dl-checkbox:checked');
+      if(checkboxes.length === 0) return alert("Pilih minimal 1 keluarga!");
+      const btn = document.getElementById('btnGeneratePDF');
+      btn.innerText = "⏳ Memproses..."; btn.disabled = true;
+      const originalIndex = currentIndex;
+      const { jsPDF } = window.jspdf; let pdf = null;
+      document.getElementById('previewContainer').classList.remove('hidden');
+
+      for (let i = 0; i < checkboxes.length; i++) {
+        currentIndex = parseInt(checkboxes[i].value); updateCardPreview();
+        await new Promise(r => setTimeout(r, 200));
+        // KODE DIPERBAIKI: useCORS DICABUT AGAR TIDAK MUNCUL TAINTED CANVAS ERROR
+        const canvas = await html2canvas(document.getElementById('cardPreview'), { scale: 2 });
         const imgData = canvas.toDataURL('image/png');
-        
-        const { jsPDF } = window.jspdf;
-        const pdf = new jsPDF({
-          orientation: 'landscape',
-          unit: 'px',
-          format: [canvas.width, canvas.height]
-        });
-        
+        if (i === 0) pdf = new jsPDF({ orientation: 'landscape', unit: 'px', format: [canvas.width, canvas.height] });
+        else pdf.addPage([canvas.width, canvas.height], 'landscape');
         pdf.addImage(imgData, 'PNG', 0, 0, canvas.width, canvas.height);
-        pdf.save(`Kartu_Iuran_${rawData[currentIndex].No_Kartu}.pdf`);
-      } catch (error) {
-        alert('Gagal membuat PDF: ' + error.message);
       }
+      if (originalIndex !== -1) { currentIndex = originalIndex; updateCardPreview(); kalkulasiTunggakan(currentIndex); }
+      pdf.save(`Kartu_Iuran_Gabungan_${checkboxes.length}_Keluarga.pdf`);
+      btn.innerText = "⏬ Unduh PDF Gabungan"; btn.disabled = false; closeModal('downloadModal');
     }
   </script>
 </body>
