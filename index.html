@@ -5,9 +5,9 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self' https: 'unsafe-inline' 'unsafe-eval'; img-src 'self' data: https:; connect-src 'self' https://script.google.com;">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self' https: 'unsafe-inline' 'unsafe-eval'; img-src 'self' data: https:; connect-src 'self' https://script.google.com https://script.googleusercontent.com;">
   
-  <title>Admin Yayasan Alam Damai - Secure Pro</title>
+  <title>Admin Yayasan Alam Damai</title>
   <link rel="preload" as="image" href="assets/kegiatan/kegiatan1.jpeg">
   <link rel="preload" as="image" href="assets/img/logo.png">
   <script src="https://cdn.tailwindcss.com"></script>
@@ -84,7 +84,7 @@
     <div class="bg-white/95 backdrop-blur-md p-8 rounded-3xl shadow-2xl w-full max-w-md text-center relative z-10">
       <img src="assets/img/logo.png" alt="Logo Alam Damai" class="h-28 w-28 object-contain mx-auto mb-4 drop-shadow-md" onerror="this.style.display='none'">
       <h2 class="text-2xl font-black text-blue-900 mb-2">Yayasan Alam Damai</h2>
-      <p class="text-gray-500 mb-6 text-sm font-medium">Sistem Manajemen Iuran Terpusat</p>
+      <p class="text-gray-500 mb-6 text-sm font-medium">Web Manajemen Iuran</p>
       
       <form onsubmit="event.preventDefault(); App.Auth.login();">
         <input type="password" id="passInput" placeholder="Password Sistem..." class="w-full p-4 border-2 border-gray-200 rounded-xl mb-4 text-center text-xl tracking-widest focus:border-blue-500 outline-none transition shadow-inner">
@@ -371,7 +371,7 @@
 
         App.UI.showLoading("Menghubungkan ke Server...");
         try {
-          const response = await fetch(`${CONFIG.API_URL}?t=${Date.now()}`);
+          const response = await fetch(CONFIG.API_URL);
           if (!response.ok) throw new Error("Network error");
           const json = await response.json();
           State.headers = json.headers;
