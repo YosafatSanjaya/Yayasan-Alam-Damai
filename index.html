@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="id">
+
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -10,17 +11,58 @@
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <style>
-    .card-table { border-collapse: collapse; width: 100%; }
-    .card-table th, .card-table td { border: 1px solid #18c3e1; padding: 6px 12px; text-align: center; font-size: 0.875rem; }
-    .card-table th { background-color: #e0f7fa; color: #0c4a6e; font-weight: 800; text-transform: uppercase; }
-    .card-table td { font-weight: 500; color: #334155; }
-    .print-card { box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1); background-image: radial-gradient(#f8fafc 10%, transparent 10%); background-size: 20px 20px; }
-    .custom-scrollbar::-webkit-scrollbar { width: 6px; }
-    .custom-scrollbar::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 10px; }
-    .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
-    #bgSlide { transition: background-image 1.5s ease-in-out; background-color: #1e3a8a; }
+    .card-table {
+      border-collapse: collapse;
+      width: 100%;
+    }
+
+    .card-table th,
+    .card-table td {
+      border: 1px solid #18c3e1;
+      padding: 6px 12px;
+      text-align: center;
+      font-size: 0.875rem;
+    }
+
+    .card-table th {
+      background-color: #e0f7fa;
+      color: #0c4a6e;
+      font-weight: 800;
+      text-transform: uppercase;
+    }
+
+    .card-table td {
+      font-weight: 500;
+      color: #334155;
+    }
+
+    .print-card {
+      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+      background-image: radial-gradient(#f8fafc 10%, transparent 10%);
+      background-size: 20px 20px;
+    }
+
+    .custom-scrollbar::-webkit-scrollbar {
+      width: 6px;
+    }
+
+    .custom-scrollbar::-webkit-scrollbar-track {
+      background: #f1f1f1;
+      border-radius: 10px;
+    }
+
+    .custom-scrollbar::-webkit-scrollbar-thumb {
+      background: #cbd5e1;
+      border-radius: 10px;
+    }
+
+    #bgSlide {
+      transition: background-image 1.5s ease-in-out;
+      background-color: #1e3a8a;
+    }
   </style>
 </head>
+
 <body class="bg-gray-100 min-h-screen text-gray-800 font-sans p-4 lg:p-8 overflow-hidden" id="mainBody">
 
   <div id="cloudLoading" class="fixed inset-0 bg-white z-[110] flex flex-col items-center justify-center hidden">
@@ -28,24 +70,35 @@
     <h2 class="text-xl font-bold text-blue-800" id="loadingText">Menyinkronkan Data...</h2>
   </div>
 
-  <div id="lockScreen" class="fixed inset-0 z-[100] flex flex-col items-center justify-center p-4 transition-opacity duration-500">
-    <div id="bgSlide" class="absolute inset-0 bg-cover bg-center" style="background-image: url('assets/kegiatan/kegiatan1.jpg');"></div>
+  <div id="lockScreen"
+    class="fixed inset-0 z-[100] flex flex-col items-center justify-center p-4 transition-opacity duration-500">
+    <div id="bgSlide" class="absolute inset-0 bg-cover bg-center"
+      style="background-image: url('assets/kegiatan/kegiatan1.jpg');"></div>
     <div class="absolute inset-0 bg-black bg-opacity-60 backdrop-blur-[3px]"></div>
     <div class="bg-white/95 backdrop-blur-md p-8 rounded-3xl shadow-2xl w-full max-w-md text-center relative z-10">
-      <img src="assets/img/logo.png" alt="Logo Alam Damai" class="h-28 w-28 object-contain mx-auto mb-4 drop-shadow-md" onerror="this.style.display='none'">
+      <img src="assets/img/logo.png" alt="Logo Alam Damai" class="h-28 w-28 object-contain mx-auto mb-4 drop-shadow-md"
+        onerror="this.style.display='none'">
       <h2 class="text-2xl font-black text-blue-900 mb-2">Yayasan Alam Damai</h2>
       <p class="text-gray-500 mb-6 text-sm font-medium">Masukkan password untuk masuk sistem</p>
-      <input type="password" id="passInput" placeholder="Password..." class="w-full p-4 border-2 border-gray-200 rounded-xl mb-4 text-center text-xl tracking-widest focus:border-blue-500 outline-none transition shadow-inner" onkeypress="if(event.key === 'Enter') checkPassword()">
+      <input type="password" id="passInput" placeholder="Password..."
+        class="w-full p-4 border-2 border-gray-200 rounded-xl mb-4 text-center text-xl tracking-widest focus:border-blue-500 outline-none transition shadow-inner"
+        onkeypress="if(event.key === 'Enter') checkPassword()">
       <p id="passError" class="text-red-500 text-sm font-bold mb-4 hidden">Password Salah! Coba lagi.</p>
-      <button onclick="checkPassword()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 rounded-xl transition shadow-lg text-lg">MASUK</button>
+      <button onclick="checkPassword()"
+        class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 rounded-xl transition shadow-lg text-lg">MASUK</button>
     </div>
   </div>
 
-  <div class="max-w-7xl mx-auto flex flex-col lg:flex-row gap-6 opacity-0 pointer-events-none transition-opacity duration-500 relative" id="mainApp">
-    <button onclick="lockApp()" class="absolute -top-3 left-0 lg:-top-6 bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-xl font-bold shadow-md flex items-center gap-2 z-50 text-sm transition">🔒 Kunci Aplikasi</button>
-    
+  <div
+    class="max-w-7xl mx-auto flex flex-col lg:flex-row gap-6 opacity-0 pointer-events-none transition-opacity duration-500 relative"
+    id="mainApp">
+    <button onclick="lockApp()"
+      class="absolute -top-3 left-0 lg:-top-6 bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-xl font-bold shadow-md flex items-center gap-2 z-50 text-sm transition">🔒
+      Kunci Aplikasi</button>
+
     <div id="adminPanel" class="w-full lg:w-1/3 flex flex-col gap-4 relative z-10 mt-8 lg:mt-6">
-      <div class="bg-gradient-to-br from-blue-700 to-indigo-900 rounded-2xl shadow-lg p-6 text-white relative overflow-hidden">
+      <div
+        class="bg-gradient-to-br from-blue-700 to-indigo-900 rounded-2xl shadow-lg p-6 text-white relative overflow-hidden">
         <div class="absolute -right-4 -top-4 opacity-10 text-9xl">💰</div>
         <p class="text-blue-100 font-bold mb-1 uppercase tracking-wider text-sm">Total Saldo</p>
         <h3 id="saldoTotal" class="text-4xl font-black tracking-tight">Rp 0</h3>
@@ -53,16 +106,22 @@
 
       <div class="bg-white p-6 rounded-2xl shadow-lg h-fit border-t-4 border-blue-500">
         <div class="flex flex-col gap-3 mb-6">
-          <button onclick="fetchDataFromCloud()" class="w-full bg-blue-600 hover:bg-blue-700 text-white px-4 py-3 rounded-xl text-sm font-bold transition shadow-md">🔄 REFRESH DATA (CLOUD)</button>
-          <button onclick="openAddModal()" class="w-full bg-purple-600 hover:bg-purple-700 text-white px-4 py-3 rounded-xl text-sm font-bold transition shadow-md">➕ TAMBAH KELUARGA BARU</button>
+          <button onclick="fetchDataFromCloud()"
+            class="w-full bg-blue-600 hover:bg-blue-700 text-white px-4 py-3 rounded-xl text-sm font-bold transition shadow-md">🔄
+            REFRESH DATA (CLOUD)</button>
+          <button onclick="openAddModal()"
+            class="w-full bg-purple-600 hover:bg-purple-700 text-white px-4 py-3 rounded-xl text-sm font-bold transition shadow-md">➕
+            TAMBAH KELUARGA BARU</button>
         </div>
-        <input type="text" id="searchInput" placeholder="🔍 Cari No Kartu, Nama..." onkeyup="renderList()" class="w-full px-4 py-3 bg-gray-50 border-2 rounded-xl focus:border-blue-500 mb-4 outline-none">
+        <input type="text" id="searchInput" placeholder="🔍 Cari No Kartu, Nama..." onkeyup="renderList()"
+          class="w-full px-4 py-3 bg-gray-50 border-2 rounded-xl focus:border-blue-500 mb-4 outline-none">
         <div id="familyList" class="space-y-2 max-h-[50vh] overflow-y-auto pr-2 custom-scrollbar"></div>
       </div>
     </div>
 
     <div id="previewPanel" class="w-full lg:w-2/3 flex flex-col gap-4 mt-8 lg:mt-6">
-      <div id="infoTagihan" class="bg-white rounded-2xl shadow-lg p-5 flex items-center justify-between border-l-8 hidden">
+      <div id="infoTagihan"
+        class="bg-white rounded-2xl shadow-lg p-5 flex items-center justify-between border-l-8 hidden">
         <div>
           <h3 class="font-black text-lg mb-1" id="lblStatusTunggakan">Status: -</h3>
           <p class="text-sm font-medium text-gray-500" id="lblDetailWajib">Wajib Iuran: -</p>
@@ -73,17 +132,31 @@
         </div>
       </div>
 
-      <div id="actionButtons" class="bg-white p-4 rounded-2xl shadow-lg flex flex-wrap justify-center gap-3 hidden border-t-4 border-yellow-400">
-        <button onclick="openEditModal()" class="bg-yellow-500 hover:bg-yellow-600 text-white px-5 py-2.5 rounded-xl font-bold shadow">✏️ Edit Pembayaran</button>
-        <button onclick="toggleFullScreen()" class="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-xl font-bold shadow">📱 Full Screen (SS)</button>
-        <button onclick="downloadPNG()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2.5 rounded-xl font-bold shadow">🖼️ Download 1 PNG</button>
-        <button onclick="openDownloadModal()" class="bg-red-600 hover:bg-red-700 text-white px-5 py-2.5 rounded-xl font-bold shadow">📄 Download PDF Massal</button>
+      <div id="actionButtons"
+        class="bg-white p-4 rounded-2xl shadow-lg flex flex-wrap justify-center gap-3 hidden border-t-4 border-yellow-400">
+        <button onclick="openEditModal()"
+          class="bg-yellow-500 hover:bg-yellow-600 text-white px-5 py-2.5 rounded-xl font-bold shadow">✏️ Edit
+          Pembayaran</button>
+        <button onclick="toggleFullScreen()"
+          class="bg-blue-600 hover:bg-blue-700 text-white px-5 py-2.5 rounded-xl font-bold shadow">📱 Full Screen
+          (SS)</button>
+        <button onclick="downloadPNG()"
+          class="bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2.5 rounded-xl font-bold shadow">🖼️ Download 1
+          PNG</button>
+        <button onclick="openDownloadModal()"
+          class="bg-red-600 hover:bg-red-700 text-white px-5 py-2.5 rounded-xl font-bold shadow">📄 Download PDF
+          Massal</button>
       </div>
 
-      <div class="overflow-x-auto bg-gray-300 p-6 rounded-2xl shadow-inner flex flex-col items-center justify-center hidden transition-all duration-300" id="previewContainer">
-        <button id="exitFullScreenBtn" onclick="toggleFullScreen()" class="hidden mb-4 bg-red-600 text-white px-6 py-2 rounded-xl font-bold shadow z-50 sticky top-0">❌ Keluar Full Screen</button>
-        
-        <div id="cardPreview" class="print-card bg-white w-[850px] min-w-[850px] p-10 rounded-xl border-[6px] border-blue-500 relative">
+      <div
+        class="overflow-x-auto bg-gray-300 p-6 rounded-2xl shadow-inner flex flex-col items-center justify-center hidden transition-all duration-300"
+        id="previewContainer">
+        <button id="exitFullScreenBtn" onclick="toggleFullScreen()"
+          class="hidden mb-4 bg-red-600 text-white px-6 py-2 rounded-xl font-bold shadow z-50 sticky top-0">❌ Keluar
+          Full Screen</button>
+
+        <div id="cardPreview"
+          class="print-card bg-white w-[850px] min-w-[850px] p-10 rounded-xl border-[6px] border-blue-500 relative">
           <div class="flex justify-between border-b-[3px] border-blue-500 pb-5 mb-6">
             <img src="assets/img/logo.png" class="h-24 w-24 object-contain" onerror="this.style.display='none'">
             <div class="text-center flex-1">
@@ -93,22 +166,44 @@
             <div class="w-24"></div>
           </div>
           <div class="grid grid-cols-12 gap-y-2 mb-6 text-base">
-            <div class="col-span-2 font-bold text-gray-700">No. Kartu</div><div class="col-span-10 font-semibold text-blue-900">: <span id="lblNoKartu"></span></div>
-            <div class="col-span-2 font-bold text-gray-700">No. Telepon</div><div class="col-span-10 font-semibold text-blue-900">: <span id="lblNoTelp"></span></div>
-            <div class="col-span-2 font-bold text-gray-700">Nama</div><div class="col-span-10 font-semibold text-blue-900">: <span id="lblNama"></span></div>
-            <div class="col-span-2 font-bold text-gray-700">Alamat</div><div class="col-span-10 font-semibold text-blue-900">: <span id="lblAlamat"></span></div>
-            <div class="col-span-2 font-bold text-gray-700">Anggota</div><div class="col-span-10 font-semibold text-blue-900">: <span id="lblAnggota"></span></div>
+            <div class="col-span-2 font-bold text-gray-700">No. Kartu</div>
+            <div class="col-span-10 font-semibold text-blue-900">: <span id="lblNoKartu"></span></div>
+            <div class="col-span-2 font-bold text-gray-700">No. Telepon</div>
+            <div class="col-span-10 font-semibold text-blue-900">: <span id="lblNoTelp"></span></div>
+            <div class="col-span-2 font-bold text-gray-700">Nama</div>
+            <div class="col-span-10 font-semibold text-blue-900">: <span id="lblNama"></span></div>
+            <div class="col-span-2 font-bold text-gray-700">Alamat</div>
+            <div class="col-span-10 font-semibold text-blue-900">: <span id="lblAlamat"></span></div>
+            <div class="col-span-2 font-bold text-gray-700">Anggota</div>
+            <div class="col-span-10 font-semibold text-blue-900">: <span id="lblAnggota"></span></div>
           </div>
           <table class="card-table mb-8 bg-white">
             <thead>
-              <tr><th class="w-1/4 py-3">Bulan</th><th class="w-1/4 py-3">Tahun 2026</th><th class="w-1/4 py-3">Tahun 2027</th><th class="w-1/4 py-3">Tahun 2028</th></tr>
+              <tr>
+                <th class="w-1/4 py-3">Bulan</th>
+                <th class="w-1/4 py-3">Tahun 2026</th>
+                <th class="w-1/4 py-3">Tahun 2027</th>
+                <th class="w-1/4 py-3">Tahun 2028</th>
+              </tr>
             </thead>
             <tbody id="tableBody"></tbody>
           </table>
           <div class="flex justify-between text-center mt-4 px-10">
-            <div><p class="font-bold mb-2">KETUA</p><img src="assets/img/tt_ketua.png" class="h-20" onerror="this.style.display='none'"><p class="underline font-bold mt-2">( Bpk. Manullang )</p></div>
-            <div><p class="font-bold mb-2">SEKRETARIS</p><img src="assets/img/tt_sekretaris.png" class="h-20" onerror="this.style.display='none'"><p class="underline font-bold mt-2">( Ibu Lucy )</p></div>
-            <div><p class="font-bold mb-2">BENDAHARA</p><img src="assets/img/tt_bendahara.png" class="h-20" onerror="this.style.display='none'"><p class="underline font-bold mt-2">( Ibu Suzan )</p></div>
+            <div>
+              <p class="font-bold mb-2">KETUA</p><img src="assets/img/tt_ketua.png" class="h-20"
+                onerror="this.style.display='none'">
+              <p class="underline font-bold mt-2">( Bpk. Manullang )</p>
+            </div>
+            <div>
+              <p class="font-bold mb-2">SEKRETARIS</p><img src="assets/img/tt_sekretaris.png" class="h-20"
+                onerror="this.style.display='none'">
+              <p class="underline font-bold mt-2">( Ibu Lucy )</p>
+            </div>
+            <div>
+              <p class="font-bold mb-2">BENDAHARA</p><img src="assets/img/tt_bendahara.png" class="h-20"
+                onerror="this.style.display='none'">
+              <p class="underline font-bold mt-2">( Ibu Suzan )</p>
+            </div>
           </div>
         </div>
       </div>
@@ -131,7 +226,8 @@
       </div>
       <div class="mt-8 flex justify-end gap-3 pt-5 border-t-2">
         <button onclick="closeModal('editModal')" class="px-6 py-2.5 bg-gray-200 rounded-xl font-bold">Batal</button>
-        <button onclick="saveChanges()" class="px-6 py-2.5 bg-blue-600 text-white rounded-xl font-bold">Simpan ke Server</button>
+        <button onclick="saveChanges()" class="px-6 py-2.5 bg-blue-600 text-white rounded-xl font-bold">Simpan ke
+          Server</button>
       </div>
     </div>
   </div>
@@ -141,30 +237,37 @@
       <h2 class="text-xl font-black mb-4">➕ Tambah Keluarga Baru</h2>
       <div class="space-y-3">
         <input type="text" id="addNoKartu" disabled class="w-full p-3 border rounded-xl bg-gray-100 font-bold">
-        <input type="text" id="addNama" placeholder="Nama Keluarga (Contoh: Bpk Asep (4))" class="w-full p-3 border rounded-xl outline-none">
+        <input type="text" id="addNama" placeholder="Nama Keluarga (Contoh: Bpk Asep (4))"
+          class="w-full p-3 border rounded-xl outline-none">
         <input type="text" id="addAlamat" placeholder="Alamat" class="w-full p-3 border rounded-xl outline-none">
         <input type="text" id="addTelp" placeholder="No Telepon" class="w-full p-3 border rounded-xl outline-none">
-        <input type="text" id="addAnggota" placeholder="Daftar Anggota (pisahkan koma)" class="w-full p-3 border rounded-xl outline-none">
+        <input type="text" id="addAnggota" placeholder="Daftar Anggota (pisahkan koma)"
+          class="w-full p-3 border rounded-xl outline-none">
       </div>
       <div class="mt-6 flex gap-3">
         <button onclick="closeModal('addModal')" class="flex-1 bg-gray-200 py-3 rounded-xl font-bold">Batal</button>
-        <button onclick="saveNewFamily()" class="flex-1 bg-blue-600 text-white py-3 rounded-xl font-bold">Simpan ke Server</button>
+        <button onclick="saveNewFamily()" class="flex-1 bg-blue-600 text-white py-3 rounded-xl font-bold">Simpan ke
+          Server</button>
       </div>
     </div>
   </div>
 
-  <div id="downloadModal" class="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center hidden z-[70] p-4">
+  <div id="downloadModal"
+    class="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center hidden z-[70] p-4">
     <div class="bg-white rounded-2xl shadow-2xl p-6 w-full max-w-2xl max-h-[90vh] flex flex-col">
       <h2 class="text-2xl font-black text-red-700 mb-2 border-b-2 pb-4">📄 Pilih Kartu untuk PDF</h2>
-      <input type="text" id="searchDownload" placeholder="🔍 Cari nama..." onkeyup="renderDownloadList()" class="w-full px-4 py-3 bg-gray-50 border-2 rounded-xl mb-3 outline-none">
+      <input type="text" id="searchDownload" placeholder="🔍 Cari nama..." onkeyup="renderDownloadList()"
+        class="w-full px-4 py-3 bg-gray-50 border-2 rounded-xl mb-3 outline-none">
       <div class="flex items-center mb-2 bg-red-50 p-2 rounded-lg border border-red-200">
-          <input type="checkbox" id="selectAllDl" onchange="toggleSelectAllDl()" class="w-5 h-5 mr-3 accent-red-600">
-          <label for="selectAllDl" class="font-bold text-red-800">Pilih Semua yang Tampil</label>
+        <input type="checkbox" id="selectAllDl" onchange="toggleSelectAllDl()" class="w-5 h-5 mr-3 accent-red-600">
+        <label for="selectAllDl" class="font-bold text-red-800">Pilih Semua yang Tampil</label>
       </div>
       <div id="downloadListContainer" class="overflow-y-auto flex-1 pr-2 space-y-2 custom-scrollbar border p-3"></div>
       <div class="mt-6 flex justify-end gap-3 pt-5 border-t-2">
-        <button onclick="closeModal('downloadModal')" class="px-6 py-2.5 bg-gray-200 rounded-xl font-bold">Batal</button>
-        <button id="btnGeneratePDF" onclick="generateMultiPDF()" class="px-6 py-2.5 bg-red-600 text-white rounded-xl font-bold">⏬ Unduh PDF Gabungan</button>
+        <button onclick="closeModal('downloadModal')"
+          class="px-6 py-2.5 bg-gray-200 rounded-xl font-bold">Batal</button>
+        <button id="btnGeneratePDF" onclick="generateMultiPDF()"
+          class="px-6 py-2.5 bg-red-600 text-white rounded-xl font-bold">⏬ Unduh PDF Gabungan</button>
       </div>
     </div>
   </div>
@@ -172,7 +275,7 @@
   <script>
     // ================= URL API GOOGLE SHEETS =================
     // ⚠️ PASTE URL WEB APP DARI GOOGLE APPS SCRIPT DI SINI! ⚠️
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwbvqOHUD-TV4NxzDE6z4fbgMWwHmbweih-lXQsjNcClNXfe1XAlTQVJsLE6JMsmwrynA/exec"; 
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwbvqOHUD-TV4NxzDE6z4fbgMWwHmbweih-lXQsjNcClNXfe1XAlTQVJsLE6JMsmwrynA/exec";
 
     const listBulan = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
     let rawData = []; let headers = []; let currentIndex = -1; let targetIuranSaatIni = 10000;
@@ -183,7 +286,7 @@
     let currentBgIndex = 0;
     setInterval(() => {
       currentBgIndex = (currentBgIndex + 1) % bgImages.length;
-      if(document.getElementById('bgSlide')) document.getElementById('bgSlide').style.backgroundImage = `url('${bgImages[currentBgIndex]}')`;
+      if (document.getElementById('bgSlide')) document.getElementById('bgSlide').style.backgroundImage = `url('${bgImages[currentBgIndex]}')`;
     }, 4000);
 
     const TARGET_HASH = "bba7bc70b393649dfbdd4603e51804e1859e12369405ce1b5548c2b60c8be4ef";
@@ -201,7 +304,7 @@
           document.getElementById('mainApp').style.opacity = '1';
           document.getElementById('mainApp').style.pointerEvents = 'auto';
           document.body.classList.remove('overflow-hidden');
-          document.getElementById('passInput').value = ''; 
+          document.getElementById('passInput').value = '';
           fetchDataFromCloud(); // Otomatis ambil data saat sukses login
         }, 500);
       } else errorMsg.classList.remove('hidden');
@@ -220,8 +323,8 @@
 
     // ==================== FETCH DATA DARI GOOGLE SHEETS ====================
     async function fetchDataFromCloud() {
-      if (SCRIPT_URL === "https://script.google.com/macros/s/AKfycbwbvqOHUD-TV4NxzDE6z4fbgMWwHmbweih-lXQsjNcClNXfe1XAlTQVJsLE6JMsmwrynA/exec") return alert("Kamu belum memasukkan URL Google Apps Script di dalam kode!");
-      
+      // Baris 'if' yang error sudah dihapus di sini
+
       const loader = document.getElementById('cloudLoading');
       const text = document.getElementById('loadingText');
       text.innerText = "Mengambil data dari Google Sheets...";
@@ -254,7 +357,7 @@
           body: JSON.stringify(payload)
         });
         // Success
-      } catch(err) {
+      } catch (err) {
         alert("Gagal menyimpan ke server! Data hanya tersimpan sementara di layar. Error: " + err);
       } finally {
         loader.classList.add('hidden');
@@ -279,7 +382,7 @@
       const data = rawData[index]; const match = (data.Nama_Keluarga || '').match(/\((\d+)\)/);
       const jumlahOrang = match ? parseInt(match[1]) : 1; targetIuranSaatIni = jumlahOrang * 10000;
       const cur = new Date(); const curHeader = `${listBulan[cur.getMonth()]}_${cur.getFullYear()}`;
-      
+
       let bulanNunggak = 0; let lewat = false;
       headers.forEach(h => {
         if (!h.includes('_202') || lewat) return;
@@ -290,7 +393,7 @@
       const box = document.getElementById('infoTagihan');
       document.getElementById('lblDetailWajib').innerText = `Wajib Iuran: Rp ${targetIuranSaatIni.toLocaleString('id-ID')}/Bulan (${jumlahOrang} Orang)`;
       box.classList.remove('hidden');
-      
+
       const lblS = document.getElementById('lblStatusTunggakan'), lblT = document.getElementById('lblNominalTunggakan');
       if (bulanNunggak > 0) {
         box.className = "bg-red-50 rounded-2xl shadow-lg p-5 flex items-center justify-between border-l-8 border-red-500 mb-4";
@@ -307,7 +410,7 @@
       const cont = document.getElementById('familyList'); cont.innerHTML = '';
       const s = document.getElementById('searchInput').value.toLowerCase(); let f = false;
       rawData.forEach((r, i) => {
-        if ((r.No_Kartu||'').toLowerCase().includes(s) || (r.Nama_Keluarga||'').toLowerCase().includes(s)) {
+        if ((r.No_Kartu || '').toLowerCase().includes(s) || (r.Nama_Keluarga || '').toLowerCase().includes(s)) {
           f = true;
           const d = document.createElement('div');
           d.className = "p-4 border-2 rounded-xl cursor-pointer transition shadow-sm " + (i === currentIndex ? "bg-blue-50 border-blue-500 shadow-blue-100" : "bg-white border-gray-100 hover:border-blue-300");
@@ -315,7 +418,7 @@
           d.onclick = () => selectFamily(i); cont.appendChild(d);
         }
       });
-      if(!f) cont.innerHTML = `<p class="text-gray-400 text-sm italic text-center mt-10">Data tidak ditemukan.</p>`;
+      if (!f) cont.innerHTML = `<p class="text-gray-400 text-sm italic text-center mt-10">Data tidak ditemukan.</p>`;
     }
 
     function selectFamily(i) {
@@ -339,7 +442,7 @@
             let v = d[col] || '', t = '', n = v;
             if (v.includes('|')) { const p = v.split('|'); t = p[0]; n = p[1]; }
             if (t && n) {
-              const dt = new Date(t); td.innerHTML = `<span class="font-extrabold text-blue-700 bg-blue-50 px-1 py-1 rounded text-xs">(${dt.getDate()}/${dt.getMonth()+1}) Rp.${n}</span>`;
+              const dt = new Date(t); td.innerHTML = `<span class="font-extrabold text-blue-700 bg-blue-50 px-1 py-1 rounded text-xs">(${dt.getDate()}/${dt.getMonth() + 1}) Rp.${n}</span>`;
             } else if (n) td.innerHTML = `<span class="text-green-600 font-bold text-xs">Lunas<br>(Rp ${n})</span>`;
             else td.innerHTML = `-`;
           } else td.innerHTML = `<span class="bg-gray-100 block w-full h-full text-transparent">-</span>`;
@@ -382,7 +485,7 @@
     }
 
     async function saveNewFamily() {
-      const nFam = {}; headers.forEach(h => nFam[h] = ''); 
+      const nFam = {}; headers.forEach(h => nFam[h] = '');
       nFam.No_Kartu = document.getElementById('addNoKartu').value; nFam.Nama_Keluarga = document.getElementById('addNama').value;
       nFam.Alamat = document.getElementById('addAlamat').value; nFam.No_Telp = document.getElementById('addTelp').value; nFam.Anggota = document.getElementById('addAnggota').value;
       rawData.push(nFam); renderList(); closeModal('addModal');
@@ -396,7 +499,7 @@
       if (c.classList.contains('fixed')) { c.className = "overflow-x-auto bg-gray-300 p-6 rounded-2xl shadow-inner flex flex-col items-center justify-center relative transition-all duration-300"; e.classList.add('hidden'); a.style.display = "flex"; document.body.classList.remove('overflow-hidden'); }
       else { c.className = "fixed inset-0 bg-gray-900 z-[80] p-6 flex flex-col items-center justify-start overflow-y-auto"; e.classList.remove('hidden'); a.style.display = "none"; document.body.classList.add('overflow-hidden'); }
     }
-    
+
     // PDF dan PNG
     async function downloadPNG() {
       try {
@@ -408,7 +511,7 @@
     function renderDownloadList() {
       const cont = document.getElementById('downloadListContainer'); cont.innerHTML = ''; const s = document.getElementById('searchDownload').value.toLowerCase();
       rawData.forEach((r, i) => {
-        if ((r.Nama_Keluarga||'').toLowerCase().includes(s)) {
+        if ((r.Nama_Keluarga || '').toLowerCase().includes(s)) {
           const d = document.createElement('div'); d.className = "flex items-center p-3 border-b hover:bg-red-50";
           d.innerHTML = `<input type="checkbox" id="dl_${i}" value="${i}" class="dl-checkbox w-5 h-5 mr-4 accent-red-600"><label for="dl_${i}" class="flex-1 font-bold"><span class="text-red-700">[No. ${r.No_Kartu}]</span> ${r.Nama_Keluarga}</label>`;
           cont.appendChild(d);
@@ -417,7 +520,7 @@
     }
     function toggleSelectAllDl() { const chk = document.getElementById('selectAllDl').checked; document.querySelectorAll('.dl-checkbox').forEach(cb => cb.checked = chk); }
     async function generateMultiPDF() {
-      const cbx = document.querySelectorAll('.dl-checkbox:checked'); if(!cbx.length) return alert("Pilih minimal 1!");
+      const cbx = document.querySelectorAll('.dl-checkbox:checked'); if (!cbx.length) return alert("Pilih minimal 1!");
       const btn = document.getElementById('btnGeneratePDF'); btn.innerText = "⏳ Memproses..."; btn.disabled = true;
       const oIdx = currentIndex; const { jsPDF } = window.jspdf; let pdf = null;
       document.getElementById('previewContainer').classList.remove('hidden');
@@ -433,4 +536,5 @@
     }
   </script>
 </body>
+
 </html>
