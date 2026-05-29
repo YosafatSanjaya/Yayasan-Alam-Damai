@@ -91,13 +91,14 @@
       }
     };
 
-    function renderList() {
+function renderList() {
       const cont = document.getElementById('familyList'); cont.innerHTML = '';
       const s = document.getElementById('searchInput').value.toLowerCase();
       if(s.length < 3) return; // Warga harus ketik minimal 3 huruf biar gak nebak semua nama
 
       rawData.forEach((r, i) => {
-        if ((r.Nama_Keluarga||'').toLowerCase().includes(s)) {
+        // PERBAIKAN DI BARIS INI (Ditambah String(...))
+        if (String(r.Nama_Keluarga || '').toLowerCase().includes(s)) {
           const d = document.createElement('div');
           d.className = "p-4 border-2 rounded-xl cursor-pointer hover:bg-blue-50 text-left";
           d.innerHTML = `<p class="font-bold text-sm text-blue-900">${r.Nama_Keluarga}</p>`;
