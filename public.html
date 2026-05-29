@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Portal Warga Alam Damai</title>
+  <link rel="preload" as="image" href="assets/img/logo.png">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <style>
+    .card-table { border-collapse: collapse; width: 100%; }
+    .card-table th, .card-table td { border: 1px solid #18c3e1; padding: 6px 12px; text-align: center; font-size: 0.875rem; }
+    .card-table th { background-color: #e0f7fa; color: #0c4a6e; font-weight: 800; text-transform: uppercase; }
+    .card-table td { font-weight: 500; color: #334155; }
+    .print-card { box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1); background-image: radial-gradient(#f8fafc 10%, transparent 10%); background-size: 20px 20px; }
+  </style>
+</head>
+<body class="bg-gray-100 min-h-screen text-gray-800 font-sans p-4 lg:p-8" id="mainBody">
+
+  <div id="cloudLoading" class="fixed inset-0 bg-white z-[110] flex flex-col items-center justify-center">
+    <img src="assets/img/logo.png" class="h-20 mb-4 animate-bounce">
+    <h2 class="text-xl font-bold text-blue-800" id="loadingText">Menghubungkan ke Server Yayasan...</h2>
+  </div>
+
+  <div class="max-w-7xl mx-auto flex flex-col lg:flex-row gap-6 relative" id="mainApp">
+    
+    <div id="adminPanel" class="w-full lg:w-1/3 flex flex-col gap-4">
+      <div class="bg-white p-6 rounded-2xl shadow-lg border-t-4 border-blue-500 text-center">
+        <img src="assets/img/logo.png" class="h-24 mx-auto mb-4">
+        <h2 class="text-xl font-black text-blue-900 mb-6">Pengecekan Kartu Iuran</h2>
+        <input type="text" id="searchInput" placeholder="🔍 Masukkan Nama Anda..." onkeyup="renderList()" class="w-full px-4 py-3 bg-gray-50 border-2 rounded-xl focus:border-blue-500 mb-4 outline-none text-lg text-center font-bold">
+        <div id="familyList" class="space-y-2 max-h-[50vh] overflow-y-auto"></div>
+      </div>
+    </div>
+
+    <div id="previewPanel" class="w-full lg:w-2/3 flex flex-col gap-4">
+      <div id="actionButtons" class="bg-white p-4 rounded-2xl shadow-lg flex justify-center gap-3 hidden">
+        <button onclick="downloadPNG()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2.5 rounded-xl font-bold shadow">🖼️ Unduh Kartu Saya (PNG)</button>
+      </div>
+
+      <div class="overflow-x-auto bg-gray-300 p-6 rounded-2xl shadow-inner flex-col items-center justify-center hidden" id="previewContainer">
+        <div id="cardPreview" class="print-card bg-white w-[850px] min-w-[850px] p-10 rounded-xl border-[6px] border-blue-500 relative">
+          <div class="flex justify-between border-b-[3px] border-blue-500 pb-5 mb-6">
+            <img src="assets/img/logo.png" class="h-24 w-24 object-contain" onerror="this.style.display='none'">
+            <div class="text-center flex-1">
+              <h1 class="text-4xl font-black text-blue-800 uppercase tracking-[0.2em] mb-1">Kartu Iuran</h1>
+              <h2 class="text-2xl font-bold text-gray-700">YAYASAN ALAM DAMAI</h2>
+            </div>
+            <div class="w-24"></div>
+          </div>
+          <div class="grid grid-cols-12 gap-y-2 mb-6 text-base">
+            <div class="col-span-2 font-bold text-gray-700">No. Kartu</div><div class="col-span-10 font-semibold text-blue-900">: <span id="lblNoKartu"></span></div>
+            <div class="col-span-2 font-bold text-gray-700">No. Telepon</div><div class="col-span-10 font-semibold text-blue-900">: <span id="lblNoTelp"></span></div>
+            <div class="col-span-2 font-bold text-gray-700">Nama</div><div class="col-span-10 font-semibold text-blue-900">: <span id="lblNama"></span></div>
+            <div class="col-span-2 font-bold text-gray-700">Alamat</div><div class="col-span-10 font-semibold text-blue-900">: <span id="lblAlamat"></span></div>
+            <div class="col-span-2 font-bold text-gray-700">Anggota</div><div class="col-span-10 font-semibold text-blue-900">: <span id="lblAnggota"></span></div>
+          </div>
+          <table class="card-table mb-8 bg-white">
+            <thead>
+              <tr><th class="w-1/4 py-3">Bulan</th><th class="w-1/4 py-3">Tahun 2026</th><th class="w-1/4 py-3">Tahun 2027</th><th class="w-1/4 py-3">Tahun 2028</th></tr>
+            </thead>
+            <tbody id="tableBody"></tbody>
+          </table>
+          <div class="flex justify-between text-center mt-4 px-10">
+            <div><p class="font-bold mb-2">KETUA</p><img src="assets/img/tt_ketua.png" class="h-20" onerror="this.style.display='none'"><p class="underline font-bold mt-2">( Bpk. Manullang )</p></div>
+            <div><p class="font-bold mb-2">SEKRETARIS</p><img src="assets/img/tt_sekretaris.png" class="h-20" onerror="this.style.display='none'"><p class="underline font-bold mt-2">( Ibu Lucy )</p></div>
+            <div><p class="font-bold mb-2">BENDAHARA</p><img src="assets/img/tt_bendahara.png" class="h-20" onerror="this.style.display='none'"><p class="underline font-bold mt-2">( Ibu Suzan )</p></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // ⚠️ PASTE URL WEB APP DARI GOOGLE APPS SCRIPT DI SINI! ⚠️
+    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwbvqOHUD-TV4NxzDE6z4fbgMWwHmbweih-lXQsjNcClNXfe1XAlTQVJsLE6JMsmwrynA/exec"; 
+    
+    const listBulan = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
+    let rawData = []; let headers = []; let currentIndex = -1;
+
+    // Otomatis tarik data saat web dibuka Warga
+    window.onload = async () => {
+      try {
+        const response = await fetch(SCRIPT_URL);
+        const json = await response.json();
+        headers = json.headers; rawData = json.data;
+        document.getElementById('cloudLoading').classList.add('hidden');
+      } catch (err) {
+        alert("Gagal konek server. Coba muat ulang halaman.");
+      }
+    };
+
+    function renderList() {
+      const cont = document.getElementById('familyList'); cont.innerHTML = '';
+      const s = document.getElementById('searchInput').value.toLowerCase();
+      if(s.length < 3) return; // Warga harus ketik minimal 3 huruf biar gak nebak semua nama
+
+      rawData.forEach((r, i) => {
+        if ((r.Nama_Keluarga||'').toLowerCase().includes(s)) {
+          const d = document.createElement('div');
+          d.className = "p-4 border-2 rounded-xl cursor-pointer hover:bg-blue-50 text-left";
+          d.innerHTML = `<p class="font-bold text-sm text-blue-900">${r.Nama_Keluarga}</p>`;
+          d.onclick = () => selectFamily(i); cont.appendChild(d);
+        }
+      });
+    }
+
+    function selectFamily(i) {
+      currentIndex = i; 
+      document.getElementById('actionButtons').classList.remove('hidden');
+      document.getElementById('previewContainer').classList.remove('hidden');
+      document.getElementById('previewContainer').classList.add('flex');
+      updateCardPreview();
+    }
+
+    function updateCardPreview() {
+      const d = rawData[currentIndex];
+      document.getElementById('lblNoKartu').innerText = d.No_Kartu || '-'; document.getElementById('lblNoTelp').innerText = d.No_Telp || '-';
+      document.getElementById('lblNama').innerText = d.Nama_Keluarga || '-'; document.getElementById('lblAlamat').innerText = d.Alamat || '-';
+      document.getElementById('lblAnggota').innerText = d.Anggota || '-';
+
+      const tb = document.getElementById('tableBody'); tb.innerHTML = '';
+      listBulan.forEach(b => {
+        const tr = document.createElement('tr'); const tdb = document.createElement('td');
+        tdb.innerText = b; tdb.className = "font-bold bg-gray-50 text-left text-blue-900"; tr.appendChild(tdb);
+        [2026, 2027, 2028].forEach(y => {
+          const col = `${b}_${y}`; const td = document.createElement('td');
+          if (headers.includes(col)) {
+            let v = d[col] || '', t = '', n = v; if (v.includes('|')) { const p = v.split('|'); t = p[0]; n = p[1]; }
+            if (t && n) {
+              const dt = new Date(t); td.innerHTML = `<span class="font-extrabold text-blue-700 bg-blue-50 px-1 py-1 rounded text-xs">(${dt.getDate()}/${dt.getMonth()+1}) Rp.${n}</span>`;
+            } else if (n) td.innerHTML = `<span class="text-green-600 font-bold text-xs">Lunas<br>(Rp ${n})</span>`;
+            else td.innerHTML = `-`;
+          } else td.innerHTML = `-`;
+          tr.appendChild(td);
+        }); tb.appendChild(tr);
+      });
+    }
+
+    async function downloadPNG() {
+      const btn = document.querySelector('#actionButtons button');
+      btn.innerText = "⏳ Sedang menyiapkan...";
+      try {
+        const canvas = await html2canvas(document.getElementById('cardPreview'), { scale: 2 });
+        const link = document.createElement('a'); link.download = `Kartu_Iuran_Saya.png`; link.href = canvas.toDataURL('image/png'); document.body.appendChild(link); link.click(); document.body.removeChild(link);
+      } catch (err) { alert("Error: " + err.message); }
+      btn.innerText = "🖼️ Unduh Kartu Saya (PNG)";
+    }
+  </script>
+</body>
+</html>
