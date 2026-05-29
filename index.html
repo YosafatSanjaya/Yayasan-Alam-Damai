@@ -4,7 +4,6 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  
   <title>Admin Yayasan Alam Damai</title>
   <link rel="preload" as="image" href="assets/kegiatan/kegiatan1.jpeg">
   <link rel="preload" as="image" href="assets/img/logo.png">
@@ -226,13 +225,6 @@
   </div>
 
   <script>
-    /**
-     * ==========================================
-     * PRODUCTION GRADE JAVASCRIPT ARCHITECTURE
-     * (V3 - Maximized Security for Serverless Frontend)
-     * ==========================================
-     */
-
     const CONFIG = {
       API_URL: "https://script.google.com/macros/s/AKfycbwbvqOHUD-TV4NxzDE6z4fbgMWwHmbweih-lXQsjNcClNXfe1XAlTQVJsLE6JMsmwrynA/exec",
       SESSION_KEY: "alamDamai_admin_token",
@@ -245,9 +237,10 @@
 
     window.addEventListener('unhandledrejection', event => {
       console.error('Unhandled Promise Rejection:', event.reason);
-      App.UI.showAlert("Terjadi kesalahan jaringan atau server. Silakan coba lagi.");
+      App.UI.showAlert("Terjadi kesalahan sistem. Silakan coba lagi.");
       App.UI.hideLoading();
     });
+
     window.onerror = function(message, source, lineno, colno, error) {
       console.error('Global JS Error:', message);
       App.UI.showAlert("Terjadi kendala pada aplikasi. Refresh halaman (F5).");
@@ -264,7 +257,6 @@
       }
     }
 
-    // 4. SECURITY & AUTHENTICATION MANAGER
     class AuthManager {
       static loginAttempts = 0;
       static lockUntil = 0;
@@ -274,7 +266,6 @@
         const errorMsg = document.getElementById('passError');
         const btn = document.getElementById('btnLogin');
 
-        // SECURITY: Rate Limiting / Anti Brute-Force Check
         if (Date.now() < this.lockUntil) {
           const waitTime = Math.ceil((this.lockUntil - Date.now()) / 1000);
           errorMsg.innerText = `Terlalu banyak percobaan. Coba lagi dalam ${waitTime} detik.`;
@@ -292,7 +283,7 @@
           const hashHex = Array.from(new Uint8Array(hashBuffer)).map(b => b.toString(16).padStart(2, '0')).join('');
 
           if (hashHex === CONFIG.TARGET_HASH) {
-            this.loginAttempts = 0; // Reset limiter
+            this.loginAttempts = 0; 
             const tokenData = { token: hashHex, expires: Date.now() + CONFIG.SESSION_TIMEOUT };
             sessionStorage.setItem(CONFIG.SESSION_KEY, JSON.stringify(tokenData));
             this.unlockApp();
@@ -310,7 +301,7 @@
       static handleFailedLogin(errorElement) {
         this.loginAttempts++;
         if (this.loginAttempts >= 7) {
-          this.lockUntil = Date.now() + 60000; // Kunci 1 menit
+          this.lockUntil = Date.now() + 60000; 
           errorElement.innerText = "Percobaan gagal 7 kali. Form dikunci selama 1 menit demi keamanan.";
           this.loginAttempts = 0;
         } else {
@@ -332,7 +323,6 @@
         }, 50);
       }
 
-      // SECURITY: Memastikan fungsi tetap jalan tapi tertutup jika sesi tidak ada
       static validateSession() {
         const sessionData = JSON.parse(sessionStorage.getItem(CONFIG.SESSION_KEY));
         if (!sessionData || sessionData.token !== CONFIG.TARGET_HASH || Date.now() > sessionData.expires) {
@@ -364,13 +354,11 @@
 
     class DataService {
       static async fetch() {
-        // SECURITY: Cek sesi sebelum ambil data
         App.Auth.validateSession(); 
-
         App.UI.showLoading("Menghubungkan ke Server...");
         try {
           const response = await fetch(CONFIG.API_URL);
-          if (!response.ok) throw new Error("Network error");
+          if (!response.ok) throw new Error("Gagal terhubung ke Google Server. Status: " + response.status);
           const json = await response.json();
           State.headers = json.headers;
           State.rawData = json.data;
@@ -378,17 +366,16 @@
           App.UI.renderList();
           this.hitungSaldoGlobal();
         } catch (err) {
-          if (err.message.includes("Sesi")) return; // Jika gagal karena sesi, diamkan (sudah dihandle logout)
-          App.UI.showAlert("Gagal mengambil data. Pastikan koneksi internet stabil.");
+          if (err.message.includes("Sesi")) return;
+          console.error("Fetch Error Detail:", err);
+          App.UI.showAlert("Koneksi ditolak server: " + err.message);
         } finally {
           App.UI.hideLoading();
         }
       }
 
       static async syncToServer(updatedRowObj) {
-        // SECURITY: Cek sesi sebelum mengirim data
         App.Auth.validateSession();
-
         App.UI.showLoading("Menyimpan ke Server...");
         try {
           const payload = { action: "update", data: updatedRowObj };
@@ -396,10 +383,11 @@
             method: "POST",
             body: JSON.stringify(payload)
           });
-          if (!response.ok) throw new Error("Server rejected request");
+          if (!response.ok) throw new Error("Gagal menyimpan ke Google Server");
         } catch (err) {
           if (err.message.includes("Sesi")) return;
-          App.UI.showAlert("Gagal menyimpan ke server! Data hanya tersimpan sementara di layar.");
+          console.error("Save Error Detail:", err);
+          App.UI.showAlert("Gagal menyimpan: " + err.message + " (Data hanya tersimpan sementara di HP/Laptop ini)");
         } finally {
           App.UI.hideLoading();
         }
@@ -503,7 +491,7 @@
         const alertBox = document.getElementById('globalAlert');
         document.getElementById('globalAlertText').innerText = msg;
         alertBox.classList.remove('hidden');
-        setTimeout(() => this.hideAlert(), 4000);
+        setTimeout(() => this.hideAlert(), 5000); // Tampil lebih lama kalau error
       }
 
       static hideAlert() {
