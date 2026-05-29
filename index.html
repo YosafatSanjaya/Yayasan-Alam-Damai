@@ -4,14 +4,16 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Admin Yayasan Alam Damai - Dark Mode</title>
-  <link rel="preload" as="image" href="assets/kegiatan/kegiatan1.jpg">
+  
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self' https: 'unsafe-inline' 'unsafe-eval'; img-src 'self' data: https:; connect-src 'self' https://script.google.com;">
+  
+  <title>Admin Yayasan Alam Damai - Secure Pro</title>
+  <link rel="preload" as="image" href="assets/kegiatan/kegiatan1.jpeg">
   <link rel="preload" as="image" href="assets/img/logo.png">
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
   <style>
-    /* Transisi global untuk dark mode */
     body, #mainApp, .bg-white, .bg-gray-100, .bg-gray-50, .bg-blue-50, .bg-red-50, .bg-green-50, .bg-gray-300, 
     .border-gray-100, .border-gray-200, .shadow-lg, .shadow-md, .shadow-sm, .rounded-2xl, .rounded-xl,
     .bg-opacity-60, .bg-black, .bg-opacity-50, .bg-blue-100, .text-gray-700, .text-gray-500, .text-gray-800,
@@ -20,250 +22,105 @@
       transition: background-color 0.3s ease, border-color 0.2s ease, color 0.2s ease, box-shadow 0.2s ease;
     }
     
-    /* Dark mode class utama untuk body */
-    body.dark-mode {
-      background-color: #0f172a !important; 
-    }
+    body.dark-mode { background-color: #0f172a !important; }
+    .dark-mode .bg-white { background-color: #1e293b !important; color: #e2e8f0 !important; border-color: #334155 !important; }
+    .dark-mode .bg-gray-100, .dark-mode .bg-gray-50, .dark-mode .bg-gray-300 { background-color: #0f172a !important; }
+    .dark-mode .bg-blue-50, .dark-mode .bg-gray-50 { background-color: #0f172a !important; }
+    .dark-mode .bg-red-50 { background-color: #2d1a1a !important; }
+    .dark-mode .bg-green-50 { background-color: #143625 !important; }
+    .dark-mode .border-gray-200, .dark-mode .border-gray-100 { border-color: #334155 !important; }
+    .dark-mode .text-gray-700, .dark-mode .text-gray-500, .dark-mode .text-gray-800 { color: #cbd5e1 !important; }
+    .dark-mode .text-blue-800, .dark-mode .text-blue-900, .dark-mode .text-blue-700 { color: #93c5fd !important; }
+    .dark-mode .text-red-800, .dark-mode .text-red-700 { color: #f87171 !important; }
+    .dark-mode .text-green-600, .dark-mode .text-green-700 { color: #4ade80 !important; }
+    .dark-mode .bg-gradient-to-br { background-image: linear-gradient(to bottom right, #1e3a8a, #0f172a) !important; }
+    .dark-mode .shadow-lg, .dark-mode .shadow-md, .dark-mode .shadow-sm { box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5), 0 4px 6px -2px rgba(0, 0, 0, 0.3) !important; }
+    .dark-mode .border-blue-500 { border-color: #3b82f6 !important; }
+    .dark-mode #previewContainer.bg-gray-300 { background-color: #0f172a !important; }
     
-    /* Dark mode untuk komponen utama */
-    .dark-mode .bg-white {
-      background-color: #1e293b !important;
-      color: #e2e8f0 !important;
-      border-color: #334155 !important;
-    }
-    
-    .dark-mode .bg-gray-100, .dark-mode .bg-gray-50, .dark-mode .bg-gray-300 {
-      background-color: #0f172a !important;
-    }
-    
-    /* Warna latar badge dan tabel disesuaikan agar lebih kontras di dark mode */
-    .dark-mode .bg-blue-50, .dark-mode .bg-gray-50 {
-      background-color: #0f172a !important;
-    }
-    
-    .dark-mode .bg-red-50 {
-      background-color: #2d1a1a !important;
-    }
-    
-    .dark-mode .bg-green-50 {
-      background-color: #143625 !important;
-    }
-    
-    .dark-mode .border-gray-200, .dark-mode .border-gray-100 {
-      border-color: #334155 !important;
-    }
-    
-    .dark-mode .text-gray-700, .dark-mode .text-gray-500, .dark-mode .text-gray-800 {
-      color: #cbd5e1 !important;
-    }
-    
-    .dark-mode .text-blue-800, .dark-mode .text-blue-900, .dark-mode .text-blue-700 {
-      color: #93c5fd !important;
-    }
-    
-    .dark-mode .text-red-800, .dark-mode .text-red-700 {
-      color: #f87171 !important;
-    }
-    
-    .dark-mode .text-green-600, .dark-mode .text-green-700 {
-      color: #4ade80 !important;
-    }
-    
-    .dark-mode .bg-gradient-to-br {
-      background-image: linear-gradient(to bottom right, #1e3a8a, #0f172a) !important;
-    }
-    
-    .dark-mode .shadow-lg, .dark-mode .shadow-md, .dark-mode .shadow-sm {
-      box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.5), 0 4px 6px -2px rgba(0, 0, 0, 0.3) !important;
-    }
-    
-    .dark-mode .border-blue-500 {
-      border-color: #3b82f6 !important;
-    }
-    
-    .dark-mode #previewContainer.bg-gray-300 {
-      background-color: #0f172a !important;
-    }
-
-    /* --------------------------------------------------------------------------
-       PERBAIKAN KHUSUS KARTU PREVIEW DI DARK MODE 
-       -------------------------------------------------------------------------- */
     .dark-mode .print-card {
       background-color: #1e293b !important;
       color: #e2e8f0 !important;
-      /* Mengganti bintik putih terang menjadi warna gelap samar agar elegan */
       background-image: radial-gradient(#0f172a 10%, transparent 10%) !important;
     }
-    
-    .dark-mode .card-table th {
-      background-color: #0f172a !important;
-      color: #7dd3fc !important;
-      border-color: #334155 !important;
-    }
-    
-    .dark-mode .card-table td {
-      border-color: #334155 !important;
-      color: #e2e8f0 !important;
-    }
-    /* -------------------------------------------------------------------------- */
-    
-    .dark-mode input, .dark-mode select, .dark-mode textarea {
-      background-color: #0f172a !important;
-      border-color: #475569 !important;
-      color: #e2e8f0 !important;
-    }
-    
-    .dark-mode input::placeholder {
-      color: #64748b !important;
-    }
-    
-    .dark-mode button.bg-gray-200 {
-      background-color: #334155 !important;
-      color: #e2e8f0 !important;
-    }
-    
-    .dark-mode .bg-black.bg-opacity-60 {
-      background-color: rgba(0, 0, 0, 0.85) !important;
-    }
-    
-    .card-table {
-      border-collapse: collapse;
-      width: 100%;
-    }
+    .dark-mode .card-table th { background-color: #0f172a !important; color: #7dd3fc !important; border-color: #334155 !important; }
+    .dark-mode .card-table td { border-color: #334155 !important; color: #e2e8f0 !important; }
+    .dark-mode input, .dark-mode select, .dark-mode textarea { background-color: #0f172a !important; border-color: #475569 !important; color: #e2e8f0 !important; }
+    .dark-mode input::placeholder { color: #64748b !important; }
+    .dark-mode button.bg-gray-200 { background-color: #334155 !important; color: #e2e8f0 !important; }
+    .dark-mode .bg-black.bg-opacity-60 { background-color: rgba(0, 0, 0, 0.85) !important; }
 
-    .card-table th,
-    .card-table td {
-      border: 1px solid #18c3e1;
-      padding: 6px 12px;
-      text-align: center;
-      font-size: 0.875rem;
-    }
-
-    .card-table th {
-      background-color: #e0f7fa;
-      color: #0c4a6e;
-      font-weight: 800;
-      text-transform: uppercase;
-    }
-
-    .card-table td {
-      font-weight: 500;
-      color: #334155;
-    }
-
-    .print-card {
-      box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
-      background-image: radial-gradient(#f8fafc 10%, transparent 10%);
-      background-size: 20px 20px;
-    }
-
-    .custom-scrollbar::-webkit-scrollbar {
-      width: 6px;
-    }
-
-    .custom-scrollbar::-webkit-scrollbar-track {
-      background: #f1f1f1;
-      border-radius: 10px;
-    }
-
-    .custom-scrollbar::-webkit-scrollbar-thumb {
-      background: #cbd5e1;
-      border-radius: 10px;
-    }
-    
-    .dark-mode .custom-scrollbar::-webkit-scrollbar-track {
-      background: #1e293b;
-    }
-    
-    .dark-mode .custom-scrollbar::-webkit-scrollbar-thumb {
-      background: #475569;
-    }
-
-    #bgSlide {
-      transition: background-image 1.5s ease-in-out;
-      background-color: #1e3a8a;
-    }
-    
-    /* Dark mode toggle button style */
-    .dark-mode-toggle {
-      background: rgba(255,255,255,0.2);
-      backdrop-filter: blur(4px);
-      border-radius: 9999px;
-      padding: 8px 16px;
-      font-weight: bold;
-      transition: all 0.2s;
-    }
-    .dark-mode-toggle:hover {
-      background: rgba(255,255,255,0.3);
-      transform: scale(1.02);
-    }
+    .card-table { border-collapse: collapse; width: 100%; }
+    .card-table th, .card-table td { border: 1px solid #18c3e1; padding: 6px 12px; text-align: center; font-size: 0.875rem; }
+    .card-table th { background-color: #e0f7fa; color: #0c4a6e; font-weight: 800; text-transform: uppercase; }
+    .card-table td { font-weight: 500; color: #334155; }
+    .print-card { box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1); background-image: radial-gradient(#f8fafc 10%, transparent 10%); background-size: 20px 20px; }
+    .custom-scrollbar::-webkit-scrollbar { width: 6px; }
+    .custom-scrollbar::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 10px; }
+    .custom-scrollbar::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+    .dark-mode .custom-scrollbar::-webkit-scrollbar-track { background: #1e293b; }
+    .dark-mode .custom-scrollbar::-webkit-scrollbar-thumb { background: #475569; }
+    #bgSlide { transition: background-image 1.5s ease-in-out; background-color: #1e3a8a; }
+    .dark-mode-toggle { background: rgba(255,255,255,0.2); backdrop-filter: blur(4px); border-radius: 9999px; padding: 8px 16px; font-weight: bold; transition: all 0.2s; }
+    .dark-mode-toggle:hover { background: rgba(255,255,255,0.3); transform: scale(1.02); }
   </style>
 </head>
 
 <body class="bg-gray-100 min-h-screen text-gray-800 font-sans p-4 lg:p-8 overflow-hidden" id="mainBody">
+
+  <div id="globalAlert" class="fixed top-4 right-4 z-[200] hidden bg-red-600 text-white px-6 py-3 rounded-xl shadow-2xl font-bold transition-all transform translate-y-0">
+    <span id="globalAlertText">Error Terjadi!</span>
+    <button onclick="App.UI.hideAlert()" class="ml-4 text-white hover:text-gray-200">✖</button>
+  </div>
 
   <div id="cloudLoading" class="fixed inset-0 bg-white z-[110] flex flex-col items-center justify-center hidden">
     <img src="assets/img/logo.png" class="h-20 mb-4 animate-bounce">
     <h2 class="text-xl font-bold text-blue-800" id="loadingText">Menyinkronkan Data...</h2>
   </div>
 
-  <div id="lockScreen"
-    class="fixed inset-0 z-[100] flex flex-col items-center justify-center p-4 transition-opacity duration-500">
-    <div id="bgSlide" class="absolute inset-0 bg-cover bg-center"
-      style="background-image: url('assets/kegiatan/kegiatan1.jpg');"></div>
+  <div id="lockScreen" class="fixed inset-0 z-[100] flex flex-col items-center justify-center p-4 transition-opacity duration-500">
+    <div id="bgSlide" class="absolute inset-0 bg-cover bg-center" style="background-image: url('assets/kegiatan/kegiatan1.jpeg');"></div>
     <div class="absolute inset-0 bg-black bg-opacity-60 backdrop-blur-[3px]"></div>
     <div class="bg-white/95 backdrop-blur-md p-8 rounded-3xl shadow-2xl w-full max-w-md text-center relative z-10">
-      <img src="assets/img/logo.png" alt="Logo Alam Damai" class="h-28 w-28 object-contain mx-auto mb-4 drop-shadow-md"
-        onerror="this.style.display='none'">
+      <img src="assets/img/logo.png" alt="Logo Alam Damai" class="h-28 w-28 object-contain mx-auto mb-4 drop-shadow-md" onerror="this.style.display='none'">
       <h2 class="text-2xl font-black text-blue-900 mb-2">Yayasan Alam Damai</h2>
-      <p class="text-gray-500 mb-6 text-sm font-medium">Masukkan password !</p>
-      <input type="password" id="passInput" placeholder="Password..."
-        class="w-full p-4 border-2 border-gray-200 rounded-xl mb-4 text-center text-xl tracking-widest focus:border-blue-500 outline-none transition shadow-inner"
-        onkeypress="if(event.key === 'Enter') checkPassword()">
-      <p id="passError" class="text-red-500 text-sm font-bold mb-4 hidden">Password Salah! Coba lagi.</p>
-      <button onclick="checkPassword()"
-        class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 rounded-xl transition shadow-lg text-lg">MASUK</button>
+      <p class="text-gray-500 mb-6 text-sm font-medium">Sistem Manajemen Iuran Terpusat</p>
+      
+      <form onsubmit="event.preventDefault(); App.Auth.login();">
+        <input type="password" id="passInput" placeholder="Password Sistem..." class="w-full p-4 border-2 border-gray-200 rounded-xl mb-4 text-center text-xl tracking-widest focus:border-blue-500 outline-none transition shadow-inner">
+        <p id="passError" class="text-red-500 text-sm font-bold mb-4 hidden">Autentikasi Gagal!</p>
+        <button id="btnLogin" type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 rounded-xl transition shadow-lg text-lg disabled:opacity-50 disabled:cursor-not-allowed">MASUK SISTEM</button>
+      </form>
     </div>
   </div>
 
-  <div
-    class="max-w-7xl mx-auto flex flex-col lg:flex-row gap-6 opacity-0 pointer-events-none transition-opacity duration-500 relative"
-    id="mainApp">
-    <button onclick="lockApp()"
-      class="absolute -top-3 left-0 lg:-top-6 bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-xl font-bold shadow-md flex items-center gap-2 z-50 text-sm transition">⏻
-      Log Out</button>
+  <div class="max-w-7xl mx-auto flex flex-col lg:flex-row gap-6 opacity-0 pointer-events-none transition-opacity duration-500 relative" id="mainApp">
+    
+    <button onclick="App.Auth.logout()" class="absolute -top-3 left-0 lg:-top-6 bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-xl font-bold shadow-md flex items-center gap-2 z-50 text-sm transition">⏻ Keluar Sesi</button>
       
-    <button id="darkModeToggleBtn" onclick="toggleDarkMode()"
-      class="absolute -top-3 right-0 lg:-top-6 bg-gray-700 hover:bg-gray-800 text-white px-4 py-2 rounded-xl font-bold shadow-md flex items-center gap-2 z-50 text-sm transition dark-mode-toggle">
+    <button id="darkModeToggleBtn" onclick="App.UI.toggleDarkMode()" class="absolute -top-3 right-0 lg:-top-6 bg-gray-700 hover:bg-gray-800 text-white px-4 py-2 rounded-xl font-bold shadow-md flex items-center gap-2 z-50 text-sm transition dark-mode-toggle">
       🌙 Dark Mode
     </button>
 
     <div id="adminPanel" class="w-full lg:w-1/3 flex flex-col gap-4 relative z-10 mt-8 lg:mt-6">
-      <div
-        class="bg-gradient-to-br from-blue-700 to-indigo-900 rounded-2xl shadow-lg p-6 text-white relative overflow-hidden">
+      <div class="bg-gradient-to-br from-blue-700 to-indigo-900 rounded-2xl shadow-lg p-6 text-white relative overflow-hidden">
         <div class="absolute -right-4 -top-4 opacity-10 text-9xl">⁺‧₊˚ ཐི⋆♱⋆ཋྀ ˚₊‧⁺</div>
-        <p class="text-blue-100 font-bold mb-1 uppercase tracking-wider text-sm">Total Saldo</p>
+        <p class="text-blue-100 font-bold mb-1 uppercase tracking-wider text-sm">Total Saldo Terkumpul</p>
         <h3 id="saldoTotal" class="text-4xl font-black tracking-tight">Rp 0</h3>
       </div>
 
       <div class="bg-white p-6 rounded-2xl shadow-lg h-fit border-t-4 border-blue-500">
         <div class="flex flex-col gap-3 mb-6">
-          <button onclick="fetchDataFromCloud()"
-            class="w-full bg-blue-600 hover:bg-blue-700 text-white px-4 py-3 rounded-xl text-sm font-bold transition shadow-md">⟲
-            REFRESH DATA </button>
-          <button onclick="openAddModal()"
-            class="w-full bg-cyan-600 hover:bg-cyan-700 text-white px-4 py-3 rounded-xl text-sm font-bold transition shadow-md">✚
-            TAMBAH KELUARGA BARU</button>
+          <button onclick="App.Data.fetch()" class="w-full bg-blue-600 hover:bg-blue-700 text-white px-4 py-3 rounded-xl text-sm font-bold transition shadow-md">⟲ SINKRONISASI SERVER</button>
+          <button onclick="App.UI.openAddModal()" class="w-full bg-cyan-600 hover:bg-cyan-700 text-white px-4 py-3 rounded-xl text-sm font-bold transition shadow-md">✚ TAMBAH KELUARGA BARU</button>
         </div>
-        <input type="text" id="searchInput" placeholder="🔍︎ Cari No Kartu, Nama..." onkeyup="renderList()"
-          class="w-full px-4 py-3 bg-gray-50 border-2 rounded-xl focus:border-blue-500 mb-4 outline-none">
+        <input type="text" id="searchInput" placeholder="🔍︎ Ketik No Kartu atau Nama..." onkeyup="App.UI.renderList()" class="w-full px-4 py-3 bg-gray-50 border-2 rounded-xl focus:border-blue-500 mb-4 outline-none transition">
         <div id="familyList" class="space-y-2 max-h-[50vh] overflow-y-auto pr-2 custom-scrollbar"></div>
       </div>
     </div>
 
     <div id="previewPanel" class="w-full lg:w-2/3 flex flex-col gap-4 mt-8 lg:mt-6">
-      <div id="infoTagihan"
-        class="bg-white rounded-2xl shadow-lg p-5 flex items-center justify-between border-l-8 hidden">
+      <div id="infoTagihan" class="bg-white rounded-2xl shadow-lg p-5 flex items-center justify-between border-l-8 hidden transition">
         <div>
           <h3 class="font-black text-lg mb-1" id="lblStatusTunggakan">Status: -</h3>
           <p class="text-sm font-medium text-gray-500" id="lblDetailWajib">Wajib Iuran: -</p>
@@ -274,29 +131,17 @@
         </div>
       </div>
 
-      <div id="actionButtons"
-        class="bg-white p-4 rounded-2xl shadow-lg flex flex-wrap justify-center gap-3 hidden border-t-4 border-yellow-400">
-        <button onclick="openEditModal()"
-          class="bg-yellow-500 hover:bg-yellow-600 text-white px-5 py-2.5 rounded-xl font-bold shadow">Edit
-          Pembayaran</button>
-        <button onclick="toggleFullScreen()"
-          class="bg-orange-600 hover:bg-orange-700 text-white px-5 py-2.5 rounded-xl font-bold shadow">Full Screen
-          (SS)</button>
-        <button onclick="downloadPNG()"
-          class="bg-green-600 hover:bg-green-700 text-white px-5 py-2.5 rounded-xl font-bold shadow">Download PNG</button>
-        <button onclick="openDownloadModal()"
-          class="bg-red-600 hover:bg-red-700 text-white px-5 py-2.5 rounded-xl font-bold shadow">Download PDF </button>
+      <div id="actionButtons" class="bg-white p-4 rounded-2xl shadow-lg flex flex-wrap justify-center gap-3 hidden border-t-4 border-yellow-400">
+        <button onclick="App.UI.openEditModal()" class="bg-yellow-500 hover:bg-yellow-600 text-white px-5 py-2.5 rounded-xl font-bold shadow transition">✏️ Edit Pembayaran</button>
+        <button onclick="App.UI.toggleFullScreen()" class="bg-orange-600 hover:bg-orange-700 text-white px-5 py-2.5 rounded-xl font-bold shadow transition">📱 Full Screen (SS)</button>
+        <button onclick="App.Export.downloadPNG()" class="bg-green-600 hover:bg-green-700 text-white px-5 py-2.5 rounded-xl font-bold shadow transition">🖼️ Download PNG</button>
+        <button onclick="App.UI.openDownloadModal()" class="bg-red-600 hover:bg-red-700 text-white px-5 py-2.5 rounded-xl font-bold shadow transition">📄 Download PDF Massal</button>
       </div>
 
-      <div
-        class="overflow-x-auto bg-gray-300 p-6 rounded-2xl shadow-inner flex flex-col items-center justify-center hidden transition-all duration-300"
-        id="previewContainer">
-        <button id="exitFullScreenBtn" onclick="toggleFullScreen()"
-          class="hidden mb-4 bg-red-600 text-white px-6 py-2 rounded-xl font-bold shadow z-50 sticky top-0">✖ Keluar
-          Full Screen</button>
+      <div class="overflow-x-auto bg-gray-300 p-6 rounded-2xl shadow-inner flex flex-col items-center justify-center hidden transition-all duration-300" id="previewContainer">
+        <button id="exitFullScreenBtn" onclick="App.UI.toggleFullScreen()" class="hidden mb-4 bg-red-600 text-white px-6 py-2 rounded-xl font-bold shadow z-50 sticky top-0">✖ Keluar Full Screen</button>
 
-        <div id="cardPreview"
-          class="print-card bg-white w-[850px] min-w-[850px] p-10 rounded-xl border-[6px] border-blue-500 relative">
+        <div id="cardPreview" class="print-card bg-white w-[850px] min-w-[850px] p-10 rounded-xl border-[6px] border-blue-500 relative">
           <div class="flex justify-between border-b-[3px] border-blue-500 pb-5 mb-6">
             <img src="assets/img/logo.png" class="h-24 w-24 object-contain" onerror="this.style.display='none'">
             <div class="text-center flex-1">
@@ -306,57 +151,35 @@
             <div class="w-24"></div>
           </div>
           <div class="grid grid-cols-12 gap-y-2 mb-6 text-base">
-            <div class="col-span-2 font-bold text-gray-700">No. Kartu</div>
-            <div class="col-span-10 font-semibold text-blue-900">: <span id="lblNoKartu"></span></div>
-            <div class="col-span-2 font-bold text-gray-700">No. Telepon</div>
-            <div class="col-span-10 font-semibold text-blue-900">: <span id="lblNoTelp"></span></div>
-            <div class="col-span-2 font-bold text-gray-700">Nama</div>
-            <div class="col-span-10 font-semibold text-blue-900">: <span id="lblNama"></span></div>
-            <div class="col-span-2 font-bold text-gray-700">Alamat</div>
-            <div class="col-span-10 font-semibold text-blue-900">: <span id="lblAlamat"></span></div>
-            <div class="col-span-2 font-bold text-gray-700">Anggota</div>
-            <div class="col-span-10 font-semibold text-blue-900">: <span id="lblAnggota"></span></div>
+            <div class="col-span-2 font-bold text-gray-700">No. Kartu</div><div class="col-span-10 font-semibold text-blue-900">: <span id="lblNoKartu"></span></div>
+            <div class="col-span-2 font-bold text-gray-700">No. Telepon</div><div class="col-span-10 font-semibold text-blue-900">: <span id="lblNoTelp"></span></div>
+            <div class="col-span-2 font-bold text-gray-700">Nama</div><div class="col-span-10 font-semibold text-blue-900">: <span id="lblNama"></span></div>
+            <div class="col-span-2 font-bold text-gray-700">Alamat</div><div class="col-span-10 font-semibold text-blue-900">: <span id="lblAlamat"></span></div>
+            <div class="col-span-2 font-bold text-gray-700">Anggota</div><div class="col-span-10 font-semibold text-blue-900">: <span id="lblAnggota"></span></div>
           </div>
           <table class="card-table mb-8 bg-white">
             <thead>
-              <tr>
-                <th class="w-1/4 py-3">Bulan</th>
-                <th class="w-1/4 py-3">Tahun 2026</th>
-                <th class="w-1/4 py-3">Tahun 2027</th>
-                <th class="w-1/4 py-3">Tahun 2028</th>
-              </tr>
+              <tr><th class="w-1/4 py-3">Bulan</th><th class="w-1/4 py-3">Tahun 2026</th><th class="w-1/4 py-3">Tahun 2027</th><th class="w-1/4 py-3">Tahun 2028</th></tr>
             </thead>
             <tbody id="tableBody"></tbody>
           </table>
           <div class="flex justify-between text-center mt-4 px-10">
-            <div>
-              <p class="font-bold mb-2">KETUA</p><img src="assets/img/tt_ketua.png" class="h-20"
-                onerror="this.style.display='none'">
-              <p class="underline font-bold mt-2">( Bpk. Manullang )</p>
-            </div>
-            <div>
-              <p class="font-bold mb-2">SEKRETARIS</p><img src="assets/img/tt_sekretaris.png" class="h-20"
-                onerror="this.style.display='none'">
-              <p class="underline font-bold mt-2">( Ibu Lucy )</p>
-            </div>
-            <div>
-              <p class="font-bold mb-2">BENDAHARA</p><img src="assets/img/tt_bendahara.png" class="h-20"
-                onerror="this.style.display='none'">
-              <p class="underline font-bold mt-2">( Ibu Suzan )</p>
-            </div>
+            <div><p class="font-bold mb-2">KETUA</p><img src="assets/img/tt_ketua.png" class="h-20" onerror="this.style.display='none'"><p class="underline font-bold mt-2">( Bpk. Manullang )</p></div>
+            <div><p class="font-bold mb-2">SEKRETARIS</p><img src="assets/img/tt_sekretaris.png" class="h-20" onerror="this.style.display='none'"><p class="underline font-bold mt-2">( Ibu Lucy )</p></div>
+            <div><p class="font-bold mb-2">BENDAHARA</p><img src="assets/img/tt_bendahara.png" class="h-20" onerror="this.style.display='none'"><p class="underline font-bold mt-2">( Ibu Suzan )</p></div>
           </div>
         </div>
       </div>
     </div>
   </div>
 
-  <div id="editModal" class="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center hidden z-[70] p-4">
+  <div id="editModal" class="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center hidden z-[70] p-4 transition-opacity">
     <div class="bg-white rounded-2xl shadow-2xl p-6 lg:p-8 w-full max-w-4xl max-h-[90vh] flex flex-col">
       <h2 class="text-2xl font-black text-blue-800 mb-4 border-b-2 pb-4">Edit Pembayaran</h2>
       <div class="overflow-y-auto flex-1 pr-2 space-y-5 custom-scrollbar">
         <div class="bg-blue-50 p-4 rounded-xl border border-blue-100">
-          <label class="block text-sm font-bold text-blue-800 mb-1">Nama Keluarga</label>
-          <input type="text" id="editNama" class="w-full border-2 rounded-lg px-4 py-2 font-semibold outline-none">
+          <label class="block text-sm font-bold text-blue-800 mb-1">Nama Keluarga (Wajib)</label>
+          <input type="text" id="editNama" class="w-full border-2 rounded-lg px-4 py-2 font-semibold outline-none focus:border-blue-500">
         </div>
         <div>
           <h3 class="font-bold gap-2">📅 Set Tanggal & Nominal Pembayaran</h3>
@@ -365,115 +188,169 @@
         </div>
       </div>
       <div class="mt-8 flex justify-end gap-3 pt-5 border-t-2">
-        <button onclick="closeModal('editModal')" class="px-6 py-2.5 bg-gray-200 rounded-xl font-bold">Batal</button>
-        <button onclick="saveChanges()" class="px-6 py-2.5 bg-blue-600 text-white rounded-xl font-bold">Simpan ke
-          Server</button>
+        <button onclick="App.UI.closeModal('editModal')" class="px-6 py-2.5 bg-gray-200 rounded-xl font-bold hover:bg-gray-300">Batal</button>
+        <button onclick="App.Data.saveChanges()" class="px-6 py-2.5 bg-blue-600 text-white rounded-xl font-bold hover:bg-blue-700 shadow-md">Simpan ke Server</button>
       </div>
     </div>
   </div>
 
-  <div id="addModal" class="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center hidden z-[70] p-4">
+  <div id="addModal" class="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center hidden z-[70] p-4 transition-opacity">
     <div class="bg-white rounded-2xl shadow-2xl p-6 w-full max-w-lg">
       <h2 class="text-xl font-black mb-4">➕ Tambah Keluarga Baru</h2>
       <div class="space-y-3">
         <input type="text" id="addNoKartu" disabled class="w-full p-3 border rounded-xl bg-gray-100 font-bold">
-        <input type="text" id="addNama" placeholder="Nama Keluarga (Contoh: Bpk Asep (4))"
-          class="w-full p-3 border rounded-xl outline-none">
-        <input type="text" id="addAlamat" placeholder="Alamat" class="w-full p-3 border rounded-xl outline-none">
-        <input type="text" id="addTelp" placeholder="No Telepon" class="w-full p-3 border rounded-xl outline-none">
-        <input type="text" id="addAnggota" placeholder="Daftar Anggota (pisahkan koma)"
-          class="w-full p-3 border rounded-xl outline-none">
+        <input type="text" id="addNama" placeholder="Nama Keluarga (Wajib)" class="w-full p-3 border rounded-xl outline-none focus:border-blue-500">
+        <input type="text" id="addAlamat" placeholder="Alamat" class="w-full p-3 border rounded-xl outline-none focus:border-blue-500">
+        <input type="text" id="addTelp" placeholder="No Telepon" class="w-full p-3 border rounded-xl outline-none focus:border-blue-500">
+        <input type="text" id="addAnggota" placeholder="Daftar Anggota (pisahkan koma)" class="w-full p-3 border rounded-xl outline-none focus:border-blue-500">
       </div>
       <div class="mt-6 flex gap-3">
-        <button onclick="closeModal('addModal')" class="flex-1 bg-gray-200 py-3 rounded-xl font-bold">Batal</button>
-        <button onclick="saveNewFamily()" class="flex-1 bg-blue-600 text-white py-3 rounded-xl font-bold">Simpan ke
-          Server</button>
+        <button onclick="App.UI.closeModal('addModal')" class="flex-1 bg-gray-200 py-3 rounded-xl font-bold hover:bg-gray-300">Batal</button>
+        <button onclick="App.Data.saveNewFamily()" class="flex-1 bg-blue-600 text-white py-3 rounded-xl font-bold hover:bg-blue-700 shadow-md">Simpan ke Server</button>
       </div>
     </div>
   </div>
 
-  <div id="downloadModal"
-    class="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center hidden z-[70] p-4">
+  <div id="downloadModal" class="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center hidden z-[70] p-4 transition-opacity">
     <div class="bg-white rounded-2xl shadow-2xl p-6 w-full max-w-2xl max-h-[90vh] flex flex-col">
       <h2 class="text-2xl font-black text-red-700 mb-2 border-b-2 pb-4">📄 Pilih Kartu untuk PDF</h2>
-      <input type="text" id="searchDownload" placeholder=" 🔍︎ Cari nama..." onkeyup="renderDownloadList()"
-        class="w-full px-4 py-3 bg-gray-50 border-2 rounded-xl mb-3 outline-none">
+      <input type="text" id="searchDownload" placeholder=" 🔍︎ Cari nama..." onkeyup="App.UI.renderDownloadList()" class="w-full px-4 py-3 bg-gray-50 border-2 rounded-xl mb-3 outline-none focus:border-red-500">
       <div class="flex items-center mb-2 bg-red-50 p-2 rounded-lg border border-red-200">
-        <input type="checkbox" id="selectAllDl" onchange="toggleSelectAllDl()" class="w-5 h-5 mr-3 accent-red-600">
-        <label for="selectAllDl" class="font-bold text-red-800">Pilih Semua</label>
+        <input type="checkbox" id="selectAllDl" onchange="App.UI.toggleSelectAllDl()" class="w-5 h-5 mr-3 accent-red-600 cursor-pointer">
+        <label for="selectAllDl" class="font-bold text-red-800 cursor-pointer">Pilih Semua</label>
       </div>
-      <div id="downloadListContainer" class="overflow-y-auto flex-1 pr-2 space-y-2 custom-scrollbar border p-3"></div>
+      <div id="downloadListContainer" class="overflow-y-auto flex-1 pr-2 space-y-2 custom-scrollbar border p-3 rounded-xl"></div>
       <div class="mt-6 flex justify-end gap-3 pt-5 border-t-2">
-        <button onclick="closeModal('downloadModal')"
-          class="px-6 py-2.5 bg-gray-200 rounded-xl font-bold">Batal</button>
-        <button id="btnGeneratePDF" onclick="generateMultiPDF()"
-          class="px-6 py-2.5 bg-red-600 text-white rounded-xl font-bold"> ⬇ Unduh PDF Gabungan</button>
+        <button onclick="App.UI.closeModal('downloadModal')" class="px-6 py-2.5 bg-gray-200 rounded-xl font-bold hover:bg-gray-300">Batal</button>
+        <button id="btnGeneratePDF" onclick="App.Export.generateMultiPDF()" class="px-6 py-2.5 bg-red-600 text-white rounded-xl font-bold hover:bg-red-700 shadow-md"> ⬇ Unduh PDF Gabungan</button>
       </div>
     </div>
   </div>
 
   <script>
-    // ================= URL API GOOGLE SHEETS =================
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwbvqOHUD-TV4NxzDE6z4fbgMWwHmbweih-lXQsjNcClNXfe1XAlTQVJsLE6JMsmwrynA/exec";
+    /**
+     * ==========================================
+     * PRODUCTION GRADE JAVASCRIPT ARCHITECTURE
+     * (V3 - Maximized Security for Serverless Frontend)
+     * ==========================================
+     */
 
-    const listBulan = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
-    let rawData = []; let headers = []; let currentIndex = -1; let targetIuranSaatIni = 10000;
+    const CONFIG = {
+      API_URL: "https://script.google.com/macros/s/AKfycbwbvqOHUD-TV4NxzDE6z4fbgMWwHmbweih-lXQsjNcClNXfe1XAlTQVJsLE6JMsmwrynA/exec",
+      SESSION_KEY: "alamDamai_admin_token",
+      SESSION_TIMEOUT: 12 * 60 * 60 * 1000, 
+      TARGET_HASH: "bba7bc70b393649dfbdd4603e51804e1859e12369405ce1b5548c2b60c8be4ef",
+      BULAN: ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"]
+    };
 
-    // Fungsi Dark Mode
-    function toggleDarkMode() {
-      const body = document.getElementById('mainBody');
-      const btn = document.getElementById('darkModeToggleBtn');
-      const isDark = body.classList.toggle('dark-mode');
-      localStorage.setItem('alamDamaiDarkMode', isDark ? 'enabled' : 'disabled');
-      
-      // Update teks tombol
-      if (isDark) {
-        btn.innerHTML = '☀︎ Light Mode';
-        btn.classList.remove('bg-gray-700', 'hover:bg-gray-800');
-        btn.classList.add('bg-gray-200', 'text-gray-800', 'hover:bg-gray-300');
-      } else {
-        btn.innerHTML = '⏾ Dark Mode';
-        btn.classList.remove('bg-gray-200', 'text-gray-800', 'hover:bg-gray-300');
-        btn.classList.add('bg-gray-700', 'hover:bg-gray-800');
+    const State = { rawData: [], headers: [], currentIndex: -1, targetIuranSaatIni: 10000 };
+
+    window.addEventListener('unhandledrejection', event => {
+      console.error('Unhandled Promise Rejection:', event.reason);
+      App.UI.showAlert("Terjadi kesalahan jaringan atau server. Silakan coba lagi.");
+      App.UI.hideLoading();
+    });
+    window.onerror = function(message, source, lineno, colno, error) {
+      console.error('Global JS Error:', message);
+      App.UI.showAlert("Terjadi kendala pada aplikasi. Refresh halaman (F5).");
+      return true; 
+    };
+
+    class Utils {
+      static sanitizeInput(str) {
+        if (!str) return "";
+        return str.replace(/[<>]/g, ""); 
       }
-    }
-    
-    // Cek preferensi dark mode saat load
-    function loadDarkModePreference() {
-      const savedMode = localStorage.getItem('alamDamaiDarkMode');
-      const body = document.getElementById('mainBody');
-      const btn = document.getElementById('darkModeToggleBtn');
-      if (savedMode === 'enabled') {
-        body.classList.add('dark-mode');
-        btn.innerHTML = '☀︎ Light Mode';
-        btn.classList.remove('bg-gray-700', 'hover:bg-gray-800');
-        btn.classList.add('bg-gray-200', 'text-gray-800', 'hover:bg-gray-300');
-      } else {
-        body.classList.remove('dark-mode');
-        btn.innerHTML = '⏾ Dark Mode';
-        btn.classList.remove('bg-gray-200', 'text-gray-800', 'hover:bg-gray-300');
-        btn.classList.add('bg-gray-700', 'hover:bg-gray-800');
+      static isInvalid(val) {
+        return !val || val.trim() === "";
       }
     }
 
-    // Slideshow Background
-    const bgImages = ['assets/kegiatan/kegiatan1.jpeg', 'assets/kegiatan/kegiatan2.jpeg', 'assets/kegiatan/kegiatan3.jpeg'];
-    bgImages.forEach(src => { const img = new Image(); img.src = src; });
-    let currentBgIndex = 0;
-    setInterval(() => {
-      currentBgIndex = (currentBgIndex + 1) % bgImages.length;
-      if (document.getElementById('bgSlide')) document.getElementById('bgSlide').style.backgroundImage = `url('${bgImages[currentBgIndex]}')`;
-    }, 4000);
+    // 4. SECURITY & AUTHENTICATION MANAGER
+    class AuthManager {
+      static loginAttempts = 0;
+      static lockUntil = 0;
 
-    const TARGET_HASH = "bba7bc70b393649dfbdd4603e51804e1859e12369405ce1b5548c2b60c8be4ef";
-    async function checkPassword() {
-      const input = document.getElementById('passInput').value;
-      const errorMsg = document.getElementById('passError');
-      const encoder = new TextEncoder();
-      const hashBuffer = await crypto.subtle.digest('SHA-256', encoder.encode(input));
-      const hashHex = Array.from(new Uint8Array(hashBuffer)).map(b => b.toString(16).padStart(2, '0')).join('');
+      static async login() {
+        const input = document.getElementById('passInput').value;
+        const errorMsg = document.getElementById('passError');
+        const btn = document.getElementById('btnLogin');
 
-      if (hashHex === TARGET_HASH) {
+        // SECURITY: Rate Limiting / Anti Brute-Force Check
+        if (Date.now() < this.lockUntil) {
+          const waitTime = Math.ceil((this.lockUntil - Date.now()) / 1000);
+          errorMsg.innerText = `Terlalu banyak percobaan. Coba lagi dalam ${waitTime} detik.`;
+          errorMsg.classList.remove('hidden');
+          return;
+        }
+
+        if (!input) return;
+        btn.disabled = true;
+        btn.innerText = "Memverifikasi...";
+
+        try {
+          const encoder = new TextEncoder();
+          const hashBuffer = await crypto.subtle.digest('SHA-256', encoder.encode(input));
+          const hashHex = Array.from(new Uint8Array(hashBuffer)).map(b => b.toString(16).padStart(2, '0')).join('');
+
+          if (hashHex === CONFIG.TARGET_HASH) {
+            this.loginAttempts = 0; // Reset limiter
+            const tokenData = { token: hashHex, expires: Date.now() + CONFIG.SESSION_TIMEOUT };
+            sessionStorage.setItem(CONFIG.SESSION_KEY, JSON.stringify(tokenData));
+            this.unlockApp();
+          } else {
+            this.handleFailedLogin(errorMsg);
+          }
+        } catch (e) {
+          App.UI.showAlert("Autentikasi bermasalah di browser ini.");
+        } finally {
+          btn.disabled = false;
+          btn.innerText = "MASUK SISTEM";
+        }
+      }
+
+      static handleFailedLogin(errorElement) {
+        this.loginAttempts++;
+        if (this.loginAttempts >= 7) {
+          this.lockUntil = Date.now() + 60000; // Kunci 1 menit
+          errorElement.innerText = "Percobaan gagal 7 kali. Form dikunci selama 1 menit demi keamanan.";
+          this.loginAttempts = 0;
+        } else {
+          errorElement.innerText = `Autentikasi Gagal! Sisa percobaan: ${7 - this.loginAttempts}`;
+        }
+        errorElement.classList.remove('hidden');
+      }
+
+      static logout() {
+        sessionStorage.removeItem(CONFIG.SESSION_KEY);
+        document.getElementById('lockScreen').style.display = 'flex';
+        setTimeout(() => {
+          document.getElementById('lockScreen').style.opacity = '1';
+          document.getElementById('mainApp').style.opacity = '0';
+          document.getElementById('mainApp').style.pointerEvents = 'none';
+          document.body.classList.add('overflow-hidden');
+          document.getElementById('passInput').value = '';
+          document.getElementById('passError').classList.add('hidden');
+        }, 50);
+      }
+
+      // SECURITY: Memastikan fungsi tetap jalan tapi tertutup jika sesi tidak ada
+      static validateSession() {
+        const sessionData = JSON.parse(sessionStorage.getItem(CONFIG.SESSION_KEY));
+        if (!sessionData || sessionData.token !== CONFIG.TARGET_HASH || Date.now() > sessionData.expires) {
+          this.logout();
+          throw new Error("Sesi tidak valid atau telah habis. Akses Ditolak.");
+        }
+      }
+
+      static checkSessionOnInit() {
+        const sessionData = JSON.parse(sessionStorage.getItem(CONFIG.SESSION_KEY));
+        if (sessionData && sessionData.token === CONFIG.TARGET_HASH && Date.now() < sessionData.expires) {
+          this.unlockApp();
+        }
+      }
+
+      static unlockApp() {
         document.getElementById('lockScreen').style.opacity = '0';
         setTimeout(() => {
           document.getElementById('lockScreen').style.display = 'none';
@@ -481,231 +358,418 @@
           document.getElementById('mainApp').style.pointerEvents = 'auto';
           document.body.classList.remove('overflow-hidden');
           document.getElementById('passInput').value = '';
-          fetchDataFromCloud(); 
-          loadDarkModePreference(); // Load dark mode setting after login
+          document.getElementById('passError').classList.add('hidden');
+          App.Data.fetch(); 
         }, 500);
-      } else errorMsg.classList.remove('hidden');
-    }
-
-    function lockApp() {
-      document.getElementById('lockScreen').style.display = 'flex';
-      document.getElementById('passError').classList.add('hidden');
-      setTimeout(() => {
-        document.getElementById('lockScreen').style.opacity = '1';
-        document.getElementById('mainApp').style.opacity = '0';
-        document.getElementById('mainApp').style.pointerEvents = 'none';
-        document.body.classList.add('overflow-hidden');
-      }, 50);
-    }
-
-    async function fetchDataFromCloud() {
-      const loader = document.getElementById('cloudLoading');
-      const text = document.getElementById('loadingText');
-      text.innerText = "Sabar Lagi Loading....";
-      loader.classList.remove('hidden');
-
-      try {
-        const response = await fetch(SCRIPT_URL);
-        const json = await response.json();
-        headers = json.headers;
-        rawData = json.data;
-        renderList();
-        hitungSaldoGlobal();
-      } catch (err) {
-        alert("Gagal akses csv. Udah Connect Internet Belum ? Error: " + err);
-      } finally {
-        loader.classList.add('hidden');
       }
     }
 
-    async function syncToServer(updatedRowObj) {
-      const loader = document.getElementById('cloudLoading');
-      document.getElementById('loadingText').innerText = "Saving Data";
-      loader.classList.remove('hidden');
+    class DataService {
+      static async fetch() {
+        // SECURITY: Cek sesi sebelum ambil data
+        App.Auth.validateSession(); 
 
-      try {
-        const payload = { action: "update", data: updatedRowObj };
-        await fetch(SCRIPT_URL, {
-          method: "POST",
-          body: JSON.stringify(payload)
+        App.UI.showLoading("Menghubungkan ke Server...");
+        try {
+          const response = await fetch(`${CONFIG.API_URL}?t=${Date.now()}`);
+          if (!response.ok) throw new Error("Network error");
+          const json = await response.json();
+          State.headers = json.headers;
+          State.rawData = json.data;
+          
+          App.UI.renderList();
+          this.hitungSaldoGlobal();
+        } catch (err) {
+          if (err.message.includes("Sesi")) return; // Jika gagal karena sesi, diamkan (sudah dihandle logout)
+          App.UI.showAlert("Gagal mengambil data. Pastikan koneksi internet stabil.");
+        } finally {
+          App.UI.hideLoading();
+        }
+      }
+
+      static async syncToServer(updatedRowObj) {
+        // SECURITY: Cek sesi sebelum mengirim data
+        App.Auth.validateSession();
+
+        App.UI.showLoading("Menyimpan ke Server...");
+        try {
+          const payload = { action: "update", data: updatedRowObj };
+          const response = await fetch(CONFIG.API_URL, {
+            method: "POST",
+            body: JSON.stringify(payload)
+          });
+          if (!response.ok) throw new Error("Server rejected request");
+        } catch (err) {
+          if (err.message.includes("Sesi")) return;
+          App.UI.showAlert("Gagal menyimpan ke server! Data hanya tersimpan sementara di layar.");
+        } finally {
+          App.UI.hideLoading();
+        }
+      }
+
+      static hitungSaldoGlobal() {
+        let totalSaldo = 0;
+        State.rawData.forEach(row => {
+          State.headers.forEach(h => {
+            if (h.includes('_202')) {
+              let val = row[h] || ''; let nominal = val.includes('|') ? val.split('|')[1] : val;
+              if (nominal && !isNaN(parseInt(nominal))) totalSaldo += parseInt(nominal);
+            }
+          });
         });
-      } catch (err) {
-        alert("Gagal menyimpan ke server! Data hanya tersimpan sementara di layar. Error: " + err);
-      } finally {
-        loader.classList.add('hidden');
+        document.getElementById('saldoTotal').innerText = "Rp " + totalSaldo.toLocaleString('id-ID');
       }
-    }
 
-    function hitungSaldoGlobal() {
-      let totalSaldo = 0;
-      rawData.forEach(row => {
-        headers.forEach(h => {
+      static kalkulasiTunggakan(index) {
+        const data = State.rawData[index]; 
+        const match = (data.Nama_Keluarga || '').match(/\((\d+)\)/);
+        const jumlahOrang = match ? parseInt(match[1]) : 1; 
+        State.targetIuranSaatIni = jumlahOrang * 10000;
+        const cur = new Date(); 
+        const curHeader = `${CONFIG.BULAN[cur.getMonth()]}_${cur.getFullYear()}`;
+
+        let bulanNunggak = 0; let lewat = false;
+        State.headers.forEach(h => {
+          if (!h.includes('_202') || lewat) return;
+          if ((data[h] || '') === '') bulanNunggak++;
+          if (h === curHeader) lewat = true;
+        });
+
+        const box = document.getElementById('infoTagihan');
+        document.getElementById('lblDetailWajib').innerText = `Wajib Iuran: Rp ${State.targetIuranSaatIni.toLocaleString('id-ID')}/Bulan (${jumlahOrang} Orang)`;
+        box.classList.remove('hidden');
+
+        const lblS = document.getElementById('lblStatusTunggakan'), lblT = document.getElementById('lblNominalTunggakan');
+        if (bulanNunggak > 0) {
+          box.className = "bg-red-50 rounded-2xl shadow-lg p-5 flex items-center justify-between border-l-8 border-red-500 mb-4 transition";
+          lblS.innerText = `⚠︎ Menunggak ${bulanNunggak} Bulan`; lblS.className = "font-black text-red-800 text-lg mb-1";
+          lblT.innerText = `Rp ${(bulanNunggak * State.targetIuranSaatIni).toLocaleString('id-ID')}`; lblT.className = "text-2xl font-black text-red-600";
+        } else {
+          box.className = "bg-green-50 rounded-2xl shadow-lg p-5 flex items-center justify-between border-l-8 border-green-500 mb-4 transition";
+          lblS.innerText = `☑ Lunas (Aman)`; lblS.className = "font-black text-green-800 text-lg mb-1";
+          lblT.innerText = `Rp 0`; lblT.className = "text-2xl font-black text-green-600";
+        }
+      }
+
+      static async saveChanges() {
+        const namaInput = document.getElementById('editNama').value;
+        if (Utils.isInvalid(namaInput)) return App.UI.showAlert("Nama keluarga tidak boleh kosong!");
+
+        const data = State.rawData[State.currentIndex]; 
+        data.Nama_Keluarga = Utils.sanitizeInput(namaInput);
+        
+        State.headers.forEach(h => {
           if (h.includes('_202')) {
-            let val = row[h] || ''; let nominal = val.includes('|') ? val.split('|')[1] : val;
-            if (nominal && !isNaN(parseInt(nominal))) totalSaldo += parseInt(nominal);
+            const id = document.getElementById(`input_date_${h}`).value;
+            const inN = document.getElementById(`input_nom_${h}`).value;
+            if (id && inN) data[h] = `${id}|${inN}`; 
+            else if (inN) data[h] = inN; 
+            else data[h] = '';
           }
         });
-      });
-      document.getElementById('saldoTotal').innerText = "Rp " + totalSaldo.toLocaleString('id-ID');
-    }
 
-    function kalkulasiTunggakan(index) {
-      const data = rawData[index]; const match = (data.Nama_Keluarga || '').match(/\((\d+)\)/);
-      const jumlahOrang = match ? parseInt(match[1]) : 1; targetIuranSaatIni = jumlahOrang * 10000;
-      const cur = new Date(); const curHeader = `${listBulan[cur.getMonth()]}_${cur.getFullYear()}`;
+        App.UI.closeModal('editModal'); 
+        App.UI.updateCardPreview(); 
+        this.hitungSaldoGlobal(); 
+        this.kalkulasiTunggakan(State.currentIndex);
+        await this.syncToServer(data);
+      }
 
-      let bulanNunggak = 0; let lewat = false;
-      headers.forEach(h => {
-        if (!h.includes('_202') || lewat) return;
-        if ((data[h] || '') === '') bulanNunggak++;
-        if (h === curHeader) lewat = true;
-      });
+      static async saveNewFamily() {
+        const namaInput = document.getElementById('addNama').value;
+        if (Utils.isInvalid(namaInput)) return App.UI.showAlert("Nama Keluarga Wajib Diisi!");
 
-      const box = document.getElementById('infoTagihan');
-      document.getElementById('lblDetailWajib').innerText = `Wajib Iuran: Rp ${targetIuranSaatIni.toLocaleString('id-ID')}/Bulan (${jumlahOrang} Orang)`;
-      box.classList.remove('hidden');
-
-      const lblS = document.getElementById('lblStatusTunggakan'), lblT = document.getElementById('lblNominalTunggakan');
-      if (bulanNunggak > 0) {
-        box.className = "bg-red-50 rounded-2xl shadow-lg p-5 flex items-center justify-between border-l-8 border-red-500 mb-4";
-        lblS.innerText = `⚠︎ Menunggak ${bulanNunggak} Bulan`; lblS.className = "font-black text-red-800 text-lg mb-1";
-        lblT.innerText = `Rp ${(bulanNunggak * targetIuranSaatIni).toLocaleString('id-ID')}`; lblT.className = "text-2xl font-black text-red-600";
-      } else {
-        box.className = "bg-green-50 rounded-2xl shadow-lg p-5 flex items-center justify-between border-l-8 border-green-500 mb-4";
-        lblS.innerText = `☑ Lunas (Aman)`; lblS.className = "font-black text-green-800 text-lg mb-1";
-        lblT.innerText = `Rp 0`; lblT.className = "text-2xl font-black text-green-600";
+        const nFam = {}; 
+        State.headers.forEach(h => nFam[h] = '');
+        nFam.No_Kartu = document.getElementById('addNoKartu').value; 
+        nFam.Nama_Keluarga = Utils.sanitizeInput(namaInput);
+        nFam.Alamat = Utils.sanitizeInput(document.getElementById('addAlamat').value); 
+        nFam.No_Telp = Utils.sanitizeInput(document.getElementById('addTelp').value); 
+        nFam.Anggota = Utils.sanitizeInput(document.getElementById('addAnggota').value);
+        
+        State.rawData.push(nFam); 
+        App.UI.renderList(); 
+        App.UI.closeModal('addModal');
+        await this.syncToServer(nFam);
       }
     }
 
-    function renderList() {
-      const cont = document.getElementById('familyList'); cont.innerHTML = '';
-      const s = document.getElementById('searchInput').value.toLowerCase(); let f = false;
-      rawData.forEach((r, i) => {
-        if (String(r.No_Kartu || '').toLowerCase().includes(s) || String(r.Nama_Keluarga || '').toLowerCase().includes(s) || String(r.Anggota || '').toLowerCase().includes(s)) {
-          f = true;
-          const d = document.createElement('div');
-          d.className = "p-4 border-2 rounded-xl cursor-pointer transition shadow-sm " + (i === currentIndex ? "bg-blue-50 border-blue-500 shadow-blue-100" : "bg-white border-gray-100 hover:border-blue-300");
-          d.innerHTML = `<div><p class="font-bold text-sm mb-1"><span class="bg-blue-100 text-blue-800 px-2 rounded mr-1">No. ${r.No_Kartu}</span> ${r.Nama_Keluarga}</p><p class="text-[11px] text-blue-600 italic">👥 Anggota: ${r.Anggota || '-'}</p></div>`;
-          d.onclick = () => selectFamily(i); cont.appendChild(d);
+    class UIController {
+      static init() {
+        this.loadDarkModePreference();
+        this.startSlideshow();
+        App.Auth.checkSessionOnInit();
+      }
+
+      static showAlert(msg) {
+        const alertBox = document.getElementById('globalAlert');
+        document.getElementById('globalAlertText').innerText = msg;
+        alertBox.classList.remove('hidden');
+        setTimeout(() => this.hideAlert(), 4000);
+      }
+
+      static hideAlert() {
+        document.getElementById('globalAlert').classList.add('hidden');
+      }
+
+      static showLoading(msg = "Loading...") {
+        document.getElementById('loadingText').innerText = msg;
+        document.getElementById('cloudLoading').classList.remove('hidden');
+      }
+
+      static hideLoading() {
+        document.getElementById('cloudLoading').classList.add('hidden');
+      }
+
+      static loadDarkModePreference() {
+        const savedMode = localStorage.getItem('alamDamaiDarkMode');
+        if (savedMode === 'enabled') {
+          document.getElementById('mainBody').classList.add('dark-mode');
+          this.updateDarkModeButton(true);
         }
-      });
-      if(!f) cont.innerHTML = `<p class="text-gray-400 text-sm italic text-center mt-10">Data tidak ditemukan.</p>`;
-    }
+      }
 
-    function selectFamily(i) {
-      currentIndex = i; renderList(); document.getElementById('actionButtons').classList.remove('hidden');
-      document.getElementById('previewContainer').classList.remove('hidden'); kalkulasiTunggakan(i); updateCardPreview();
-    }
+      static toggleDarkMode() {
+        const body = document.getElementById('mainBody');
+        const isDark = body.classList.toggle('dark-mode');
+        localStorage.setItem('alamDamaiDarkMode', isDark ? 'enabled' : 'disabled');
+        this.updateDarkModeButton(isDark);
+      }
 
-    function updateCardPreview() {
-      if (currentIndex === -1) return; const d = rawData[currentIndex];
-      document.getElementById('lblNoKartu').innerText = d.No_Kartu || '-'; document.getElementById('lblNoTelp').innerText = d.No_Telp || '-';
-      document.getElementById('lblNama').innerText = d.Nama_Keluarga || '-'; document.getElementById('lblAlamat').innerText = d.Alamat || '-';
-      document.getElementById('lblAnggota').innerText = d.Anggota || '-';
+      static updateDarkModeButton(isDark) {
+        const btn = document.getElementById('darkModeToggleBtn');
+        if (isDark) {
+          btn.innerHTML = '☀︎ Light Mode';
+          btn.classList.remove('bg-gray-700', 'hover:bg-gray-800');
+          btn.classList.add('bg-gray-200', 'text-gray-800', 'hover:bg-gray-300');
+        } else {
+          btn.innerHTML = '⏾ Dark Mode';
+          btn.classList.remove('bg-gray-200', 'text-gray-800', 'hover:bg-gray-300');
+          btn.classList.add('bg-gray-700', 'hover:bg-gray-800');
+        }
+      }
 
-      const tb = document.getElementById('tableBody'); tb.innerHTML = '';
-      listBulan.forEach(b => {
-        const tr = document.createElement('tr'); const tdb = document.createElement('td');
-        tdb.innerText = b; tdb.className = "font-bold bg-gray-50 text-left text-blue-900"; tr.appendChild(tdb);
-        [2026, 2027, 2028].forEach(y => {
-          const col = `${b}_${y}`; const td = document.createElement('td');
-          if (headers.includes(col)) {
-            let v = d[col] || '', t = '', n = v;
+      static startSlideshow() {
+        const bgImages = ['assets/kegiatan/kegiatan1.jpeg', 'assets/kegiatan/kegiatan2.jpeg', 'assets/kegiatan/kegiatan3.jpeg'];
+        let currentBgIndex = 0;
+        setInterval(() => {
+          currentBgIndex = (currentBgIndex + 1) % bgImages.length;
+          const slide = document.getElementById('bgSlide');
+          if (slide) slide.style.backgroundImage = `url('${bgImages[currentBgIndex]}')`;
+        }, 4000);
+      }
+
+      static renderList() {
+        const cont = document.getElementById('familyList'); 
+        cont.innerHTML = '';
+        const s = document.getElementById('searchInput').value.toLowerCase(); 
+        let f = false;
+        
+        State.rawData.forEach((r, i) => {
+          if (String(r.No_Kartu || '').toLowerCase().includes(s) || String(r.Nama_Keluarga || '').toLowerCase().includes(s) || String(r.Anggota || '').toLowerCase().includes(s)) {
+            f = true;
+            const d = document.createElement('div');
+            d.className = "p-4 border-2 rounded-xl cursor-pointer transition shadow-sm " + (i === State.currentIndex ? "bg-blue-50 border-blue-500 shadow-blue-100" : "bg-white border-gray-100 hover:border-blue-300");
+            d.innerHTML = `<div><p class="font-bold text-sm mb-1"><span class="bg-blue-100 text-blue-800 px-2 rounded mr-1">No. ${Utils.sanitizeInput(r.No_Kartu)}</span> ${Utils.sanitizeInput(r.Nama_Keluarga)}</p><p class="text-[11px] text-blue-600 italic">👥 Anggota: ${Utils.sanitizeInput(r.Anggota) || '-'}</p></div>`;
+            d.onclick = () => this.selectFamily(i); 
+            cont.appendChild(d);
+          }
+        });
+        if (!f) cont.innerHTML = `<p class="text-gray-400 text-sm italic text-center mt-10">Data tidak ditemukan.</p>`;
+      }
+
+      static selectFamily(i) {
+        State.currentIndex = i; 
+        this.renderList(); 
+        document.getElementById('actionButtons').classList.remove('hidden');
+        document.getElementById('previewContainer').classList.remove('hidden'); 
+        App.Data.kalkulasiTunggakan(i); 
+        this.updateCardPreview();
+      }
+
+      static updateCardPreview() {
+        if (State.currentIndex === -1) return; 
+        const d = State.rawData[State.currentIndex];
+        document.getElementById('lblNoKartu').innerText = d.No_Kartu || '-'; 
+        document.getElementById('lblNoTelp').innerText = d.No_Telp || '-';
+        document.getElementById('lblNama').innerText = d.Nama_Keluarga || '-'; 
+        document.getElementById('lblAlamat').innerText = d.Alamat || '-';
+        document.getElementById('lblAnggota').innerText = d.Anggota || '-';
+
+        const tb = document.getElementById('tableBody'); tb.innerHTML = '';
+        CONFIG.BULAN.forEach(b => {
+          const tr = document.createElement('tr'); 
+          const tdb = document.createElement('td');
+          tdb.innerText = b; 
+          tdb.className = "font-bold bg-gray-50 text-left text-blue-900"; 
+          tr.appendChild(tdb);
+          
+          [2026, 2027, 2028].forEach(y => {
+            const col = `${b}_${y}`; 
+            const td = document.createElement('td');
+            if (State.headers.includes(col)) {
+              let v = d[col] || '', t = '', n = v;
+              if (v.includes('|')) { const p = v.split('|'); t = p[0]; n = p[1]; }
+              if (t && n) {
+                const dt = new Date(t); 
+                td.innerHTML = `<span class="font-extrabold text-blue-700 bg-blue-50 px-1 py-1 rounded text-xs">(${dt.getDate()}/${dt.getMonth() + 1}) Rp.${n}</span>`;
+              } else if (n) {
+                td.innerHTML = `<span class="text-green-600 font-bold text-xs">Lunas<br>(Rp ${n})</span>`;
+              } else td.innerHTML = `-`;
+            } else {
+              td.innerHTML = `<span class="bg-gray-100 block w-full h-full text-transparent">-</span>`;
+            }
+            tr.appendChild(td);
+          }); 
+          tb.appendChild(tr);
+        });
+      }
+
+      static openEditModal() {
+        if (State.currentIndex === -1) return; 
+        const d = State.rawData[State.currentIndex];
+        document.getElementById('editNama').value = d.Nama_Keluarga; 
+        const c = document.getElementById('editMonthsContainer'); 
+        c.innerHTML = '';
+        
+        State.headers.forEach(h => {
+          if (h.includes('_202')) {
+            const div = document.createElement('div'); div.className = "flex flex-col border p-3 rounded-xl bg-gray-50 transition focus-within:border-blue-400";
+            const l = document.createElement('label'); l.className = "text-xs font-bold mb-2 uppercase"; l.innerText = h.replace('_', ' ');
+            const id = document.createElement('input'); id.type = "date"; id.className = "text-sm border rounded-lg p-1.5 mb-2 w-full outline-none"; id.id = `input_date_${h}`;
+            const inN = document.createElement('input'); inN.type = "number"; inN.placeholder = `Rp ${State.targetIuranSaatIni}`; inN.className = "text-sm border rounded-lg p-1.5 w-full font-semibold text-green-700 outline-none"; inN.id = `input_nom_${h}`;
+            
+            let v = d[h] || '', t = '', n = v; 
             if (v.includes('|')) { const p = v.split('|'); t = p[0]; n = p[1]; }
-            if (t && n) {
-              const dt = new Date(t); td.innerHTML = `<span class="font-extrabold text-blue-700 bg-blue-50 px-1 py-1 rounded text-xs">(${dt.getDate()}/${dt.getMonth() + 1}) Rp.${n}</span>`;
-            } else if (n) td.innerHTML = `<span class="text-green-600 font-bold text-xs">Lunas<br>(Rp ${n})</span>`;
-            else td.innerHTML = `-`;
-          } else td.innerHTML = `<span class="bg-gray-100 block w-full h-full text-transparent">-</span>`;
-          tr.appendChild(td);
-        }); tb.appendChild(tr);
-      });
-    }
-
-    function openEditModal() {
-      if (currentIndex === -1) return; const d = rawData[currentIndex];
-      document.getElementById('editNama').value = d.Nama_Keluarga; const c = document.getElementById('editMonthsContainer'); c.innerHTML = '';
-      headers.forEach(h => {
-        if (h.includes('_202')) {
-          const div = document.createElement('div'); div.className = "flex flex-col border p-3 rounded-xl bg-gray-50";
-          const l = document.createElement('label'); l.className = "text-xs font-bold mb-2 uppercase"; l.innerText = h.replace('_', ' ');
-          const id = document.createElement('input'); id.type = "date"; id.className = "text-sm border rounded-lg p-1.5 mb-2 w-full"; id.id = `input_date_${h}`;
-          const inN = document.createElement('input'); inN.type = "number"; inN.placeholder = `Rp ${targetIuranSaatIni}`; inN.className = "text-sm border rounded-lg p-1.5 w-full font-semibold text-green-700"; inN.id = `input_nom_${h}`;
-          let v = d[h] || '', t = '', n = v; if (v.includes('|')) { const p = v.split('|'); t = p[0]; n = p[1]; }
-          id.value = t; inN.value = n; div.appendChild(l); div.appendChild(id); div.appendChild(inN); c.appendChild(div);
-        }
-      }); document.getElementById('editModal').classList.remove('hidden');
-    }
-
-    async function saveChanges() {
-      const data = rawData[currentIndex]; data.Nama_Keluarga = document.getElementById('editNama').value;
-      headers.forEach(h => {
-        if (h.includes('_202')) {
-          const id = document.getElementById(`input_date_${h}`).value, inN = document.getElementById(`input_nom_${h}`).value;
-          if (id && inN) data[h] = `${id}|${inN}`; else if (inN) data[h] = inN; else data[h] = '';
-        }
-      });
-      closeModal('editModal'); updateCardPreview(); hitungSaldoGlobal(); kalkulasiTunggakan(currentIndex);
-      await syncToServer(data);
-    }
-
-    function openAddModal() {
-      if (rawData.length === 0) return alert("Refresh data dari cloud dulu!");
-      const mx = Math.max(...rawData.map(r => parseInt(r.No_Kartu) || 0)); document.getElementById('addNoKartu').value = mx + 1;
-      document.getElementById('addModal').classList.remove('hidden');
-    }
-
-    async function saveNewFamily() {
-      const nFam = {}; headers.forEach(h => nFam[h] = '');
-      nFam.No_Kartu = document.getElementById('addNoKartu').value; nFam.Nama_Keluarga = document.getElementById('addNama').value;
-      nFam.Alamat = document.getElementById('addAlamat').value; nFam.No_Telp = document.getElementById('addTelp').value; nFam.Anggota = document.getElementById('addAnggota').value;
-      rawData.push(nFam); renderList(); closeModal('addModal');
-      await syncToServer(nFam);
-      alert("Keluarga ditambahkan dan dikirim ke server!");
-    }
-
-    function closeModal(id) { document.getElementById(id).classList.add('hidden'); }
-    function toggleFullScreen() {
-      const c = document.getElementById('previewContainer'), e = document.getElementById('exitFullScreenBtn'), a = document.getElementById('adminPanel');
-      if (c.classList.contains('fixed')) { c.className = "overflow-x-auto bg-gray-300 p-6 rounded-2xl shadow-inner flex flex-col items-center justify-center relative transition-all duration-300"; e.classList.add('hidden'); a.style.display = "flex"; document.body.classList.remove('overflow-hidden'); }
-      else { c.className = "fixed inset-0 bg-gray-900 z-[80] p-6 flex flex-col items-center justify-start overflow-y-auto"; e.classList.remove('hidden'); a.style.display = "none"; document.body.classList.add('overflow-hidden'); }
-    }
-
-    async function downloadPNG() {
-      try {
-        const canvas = await html2canvas(document.getElementById('cardPreview'), { scale: 2 });
-        const link = document.createElement('a'); link.download = `Kartu_${rawData[currentIndex].No_Kartu}.png`; link.href = canvas.toDataURL('image/png'); document.body.appendChild(link); link.click(); document.body.removeChild(link);
-      } catch (err) { alert("Error: " + err.message); }
-    }
-    function openDownloadModal() { document.getElementById('downloadModal').classList.remove('hidden'); renderDownloadList(); }
-    
-    function renderDownloadList() {
-      const cont = document.getElementById('downloadListContainer'); cont.innerHTML = ''; const s = document.getElementById('searchDownload').value.toLowerCase();
-      rawData.forEach((r, i) => {
-        if (String(r.Nama_Keluarga || '').toLowerCase().includes(s)) {
-          const d = document.createElement('div'); d.className = "flex items-center p-3 border-b hover:bg-red-50";
-          d.innerHTML = `<input type="checkbox" id="dl_${i}" value="${i}" class="dl-checkbox w-5 h-5 mr-4 accent-red-600"><label for="dl_${i}" class="flex-1 font-bold"><span class="text-red-700">[No. ${r.No_Kartu}]</span> ${r.Nama_Keluarga}</label>`;
-          cont.appendChild(d);
-        }
-      });
-    }
-    function toggleSelectAllDl() { const chk = document.getElementById('selectAllDl').checked; document.querySelectorAll('.dl-checkbox').forEach(cb => cb.checked = chk); }
-    async function generateMultiPDF() {
-      const cbx = document.querySelectorAll('.dl-checkbox:checked'); if (!cbx.length) return alert("Pilih minimal 1!");
-      const btn = document.getElementById('btnGeneratePDF'); btn.innerText = " ⧗ Memproses..."; btn.disabled = true;
-      const oIdx = currentIndex; const { jsPDF } = window.jspdf; let pdf = null;
-      document.getElementById('previewContainer').classList.remove('hidden');
-      for (let i = 0; i < cbx.length; i++) {
-        currentIndex = parseInt(cbx[i].value); updateCardPreview(); await new Promise(r => setTimeout(r, 200));
-        const canvas = await html2canvas(document.getElementById('cardPreview'), { scale: 1.5 });
-        if (i === 0) pdf = new jsPDF({ orientation: 'landscape', unit: 'px', format: [canvas.width, canvas.height] });
-        else pdf.addPage([canvas.width, canvas.height], 'landscape');
-        pdf.addImage(canvas.toDataURL('image/jpeg', 0.7), 'JPEG', 0, 0, canvas.width, canvas.height);
+            id.value = t; inN.value = n; 
+            
+            div.appendChild(l); div.appendChild(id); div.appendChild(inN); 
+            c.appendChild(div);
+          }
+        }); 
+        document.getElementById('editModal').classList.remove('hidden');
       }
-      currentIndex = oIdx; updateCardPreview(); pdf.save(`Kartu_Gabungan.pdf`);
-      btn.innerText = "⏬ Unduh PDF Gabungan"; btn.disabled = false; closeModal('downloadModal');
+
+      static openAddModal() {
+        if (State.rawData.length === 0) return App.UI.showAlert("Sinkronisasi server terlebih dahulu!");
+        const mx = Math.max(...State.rawData.map(r => parseInt(r.No_Kartu) || 0)); 
+        document.getElementById('addNoKartu').value = mx + 1;
+        document.getElementById('addModal').classList.remove('hidden');
+      }
+
+      static closeModal(id) { 
+        document.getElementById(id).classList.add('hidden'); 
+      }
+
+      static toggleFullScreen() {
+        const c = document.getElementById('previewContainer');
+        const e = document.getElementById('exitFullScreenBtn');
+        const a = document.getElementById('adminPanel');
+        
+        if (c.classList.contains('fixed')) { 
+          c.className = "overflow-x-auto bg-gray-300 p-6 rounded-2xl shadow-inner flex flex-col items-center justify-center relative transition-all duration-300"; 
+          e.classList.add('hidden'); 
+          a.style.display = "flex"; 
+          document.body.classList.remove('overflow-hidden'); 
+        } else { 
+          c.className = "fixed inset-0 bg-gray-900 z-[80] p-6 flex flex-col items-center justify-start overflow-y-auto"; 
+          e.classList.remove('hidden'); 
+          a.style.display = "none"; 
+          document.body.classList.add('overflow-hidden'); 
+        }
+      }
+
+      static openDownloadModal() { 
+        document.getElementById('downloadModal').classList.remove('hidden'); 
+        this.renderDownloadList(); 
+      }
+      
+      static renderDownloadList() {
+        const cont = document.getElementById('downloadListContainer'); 
+        cont.innerHTML = ''; 
+        const s = document.getElementById('searchDownload').value.toLowerCase();
+        
+        State.rawData.forEach((r, i) => {
+          if (String(r.Nama_Keluarga || '').toLowerCase().includes(s)) {
+            const d = document.createElement('div'); 
+            d.className = "flex items-center p-3 border-b hover:bg-red-50 transition";
+            d.innerHTML = `<input type="checkbox" id="dl_${i}" value="${i}" class="dl-checkbox w-5 h-5 mr-4 accent-red-600 cursor-pointer"><label for="dl_${i}" class="flex-1 font-bold cursor-pointer"><span class="text-red-700">[No. ${Utils.sanitizeInput(r.No_Kartu)}]</span> ${Utils.sanitizeInput(r.Nama_Keluarga)}</label>`;
+            cont.appendChild(d);
+          }
+        });
+      }
+
+      static toggleSelectAllDl() { 
+        const chk = document.getElementById('selectAllDl').checked; 
+        document.querySelectorAll('.dl-checkbox').forEach(cb => cb.checked = chk); 
+      }
     }
+
+    class ExportController {
+      static async downloadPNG() {
+        try {
+          const canvas = await html2canvas(document.getElementById('cardPreview'), { scale: 2 });
+          const link = document.createElement('a'); 
+          link.download = `Kartu_${State.rawData[State.currentIndex].No_Kartu}.png`; 
+          link.href = canvas.toDataURL('image/png'); 
+          document.body.appendChild(link); 
+          link.click(); 
+          document.body.removeChild(link);
+        } catch (err) { 
+          App.UI.showAlert("Gagal render gambar: " + err.message); 
+        }
+      }
+
+      static async generateMultiPDF() {
+        const cbx = document.querySelectorAll('.dl-checkbox:checked'); 
+        if (!cbx.length) return App.UI.showAlert("Pilih minimal 1 keluarga untuk diunduh!");
+        
+        const btn = document.getElementById('btnGeneratePDF'); 
+        btn.innerText = " ⧗ Memproses..."; 
+        btn.disabled = true;
+        
+        const oIdx = State.currentIndex; 
+        const { jsPDF } = window.jspdf; 
+        let pdf = null;
+        document.getElementById('previewContainer').classList.remove('hidden');
+        
+        try {
+          for (let i = 0; i < cbx.length; i++) {
+            State.currentIndex = parseInt(cbx[i].value); 
+            App.UI.updateCardPreview(); 
+            await new Promise(r => setTimeout(r, 200));
+            
+            const canvas = await html2canvas(document.getElementById('cardPreview'), { scale: 1.5 });
+            if (i === 0) {
+              pdf = new jsPDF({ orientation: 'landscape', unit: 'px', format: [canvas.width, canvas.height] });
+            } else {
+              pdf.addPage([canvas.width, canvas.height], 'landscape');
+            }
+            pdf.addImage(canvas.toDataURL('image/jpeg', 0.7), 'JPEG', 0, 0, canvas.width, canvas.height);
+          }
+          State.currentIndex = oIdx; 
+          App.UI.updateCardPreview(); 
+          pdf.save(`Kartu_Gabungan.pdf`);
+          App.UI.closeModal('downloadModal');
+        } catch (error) {
+          App.UI.showAlert("Gagal memproses PDF.");
+        } finally {
+          btn.innerText = "⏬ Unduh PDF Gabungan"; 
+          btn.disabled = false; 
+        }
+      }
+    }
+
+    const App = {
+      Auth: AuthManager,
+      Data: DataService,
+      UI: UIController,
+      Export: ExportController
+    };
+
+    window.onload = () => {
+      App.UI.init();
+    };
   </script>
 </body>
-
 </html>
