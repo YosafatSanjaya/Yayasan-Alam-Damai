@@ -79,7 +79,7 @@
       <img src="assets/img/logo.png" alt="Logo Alam Damai" class="h-28 w-28 object-contain mx-auto mb-4 drop-shadow-md"
         onerror="this.style.display='none'">
       <h2 class="text-2xl font-black text-blue-900 mb-2">Yayasan Alam Damai</h2>
-      <p class="text-gray-500 mb-6 text-sm font-medium">Masukkan password untuk masuk sistem</p>
+      <p class="text-gray-500 mb-6 text-sm font-medium">Masukkan password !</p>
       <input type="password" id="passInput" placeholder="Password..."
         class="w-full p-4 border-2 border-gray-200 rounded-xl mb-4 text-center text-xl tracking-widest focus:border-blue-500 outline-none transition shadow-inner"
         onkeypress="if(event.key === 'Enter') checkPassword()">
@@ -93,8 +93,8 @@
     class="max-w-7xl mx-auto flex flex-col lg:flex-row gap-6 opacity-0 pointer-events-none transition-opacity duration-500 relative"
     id="mainApp">
     <button onclick="lockApp()"
-      class="absolute -top-3 left-0 lg:-top-6 bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-xl font-bold shadow-md flex items-center gap-2 z-50 text-sm transition">🔒
-      Kunci Aplikasi</button>
+      class="absolute -top-3 left-0 lg:-top-6 bg-red-600 hover:bg-red-700 text-white px-4 py-2 rounded-xl font-bold shadow-md flex items-center gap-2 z-50 text-sm transition">⏻
+      Log Out</button>
 
     <div id="adminPanel" class="w-full lg:w-1/3 flex flex-col gap-4 relative z-10 mt-8 lg:mt-6">
       <div
@@ -260,7 +260,7 @@
         class="w-full px-4 py-3 bg-gray-50 border-2 rounded-xl mb-3 outline-none">
       <div class="flex items-center mb-2 bg-red-50 p-2 rounded-lg border border-red-200">
         <input type="checkbox" id="selectAllDl" onchange="toggleSelectAllDl()" class="w-5 h-5 mr-3 accent-red-600">
-        <label for="selectAllDl" class="font-bold text-red-800">Pilih Semua yang Tampil</label>
+        <label for="selectAllDl" class="font-bold text-red-800">Pilih Semua</label>
       </div>
       <div id="downloadListContainer" class="overflow-y-auto flex-1 pr-2 space-y-2 custom-scrollbar border p-3"></div>
       <div class="mt-6 flex justify-end gap-3 pt-5 border-t-2">
@@ -274,14 +274,14 @@
 
   <script>
     // ================= URL API GOOGLE SHEETS =================
-    // ⚠️ PASTE URL WEB APP DARI GOOGLE APPS SCRIPT DI SINI! ⚠️
+    //  URL WEB APP DARI GOOGLE APPS SCRIPT 
     const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwbvqOHUD-TV4NxzDE6z4fbgMWwHmbweih-lXQsjNcClNXfe1XAlTQVJsLE6JMsmwrynA/exec";
 
     const listBulan = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
     let rawData = []; let headers = []; let currentIndex = -1; let targetIuranSaatIni = 10000;
 
     // Slideshow Background
-    const bgImages = ['assets/kegiatan/kegiatan1.jpg', 'assets/kegiatan/kegiatan2.jpg', 'assets/kegiatan/kegiatan3.jpg'];
+    const bgImages = ['assets/kegiatan/kegiatan1.jpeg', 'assets/kegiatan/kegiatan2.jpeg', 'assets/kegiatan/kegiatan3.jpeg'];
     bgImages.forEach(src => { const img = new Image(); img.src = src; });
     let currentBgIndex = 0;
     setInterval(() => {
@@ -323,11 +323,9 @@
 
     // ==================== FETCH DATA DARI GOOGLE SHEETS ====================
     async function fetchDataFromCloud() {
-      // Baris 'if' yang error sudah dihapus di sini
-
       const loader = document.getElementById('cloudLoading');
       const text = document.getElementById('loadingText');
-      text.innerText = "Mengambil data dari Google Sheets...";
+      text.innerText = "Sabar Lagi Loading....";
       loader.classList.remove('hidden');
 
       try {
@@ -338,7 +336,7 @@
         renderList();
         hitungSaldoGlobal();
       } catch (err) {
-        alert("Gagal mengambil data. Pastikan koneksi internet jalan! Error: " + err);
+        alert("Gagal akses csv. Udah Connect Internet Belum ? Error: " + err);
       } finally {
         loader.classList.add('hidden');
       }
@@ -347,7 +345,7 @@
     // ==================== SIMPAN DATA KE GOOGLE SHEETS ====================
     async function syncToServer(updatedRowObj) {
       const loader = document.getElementById('cloudLoading');
-      document.getElementById('loadingText').innerText = "Menyimpan ke Google Sheets...";
+      document.getElementById('loadingText').innerText = "Saving Data";
       loader.classList.remove('hidden');
 
       try {
