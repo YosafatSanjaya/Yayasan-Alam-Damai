@@ -410,7 +410,8 @@
       const cont = document.getElementById('familyList'); cont.innerHTML = '';
       const s = document.getElementById('searchInput').value.toLowerCase(); let f = false;
       rawData.forEach((r, i) => {
-        if ((r.No_Kartu || '').toLowerCase().includes(s) || (r.Nama_Keluarga || '').toLowerCase().includes(s)) {
+        // PERBAIKAN DI BARIS INI (Ditambah String(...))
+        if (String(r.No_Kartu || '').toLowerCase().includes(s) || String(r.Nama_Keluarga || '').toLowerCase().includes(s) || String(r.Anggota || '').toLowerCase().includes(s)) {
           f = true;
           const d = document.createElement('div');
           d.className = "p-4 border-2 rounded-xl cursor-pointer transition shadow-sm " + (i === currentIndex ? "bg-blue-50 border-blue-500 shadow-blue-100" : "bg-white border-gray-100 hover:border-blue-300");
@@ -418,7 +419,7 @@
           d.onclick = () => selectFamily(i); cont.appendChild(d);
         }
       });
-      if (!f) cont.innerHTML = `<p class="text-gray-400 text-sm italic text-center mt-10">Data tidak ditemukan.</p>`;
+      if(!f) cont.innerHTML = `<p class="text-gray-400 text-sm italic text-center mt-10">Data tidak ditemukan.</p>`;
     }
 
     function selectFamily(i) {
@@ -508,10 +509,12 @@
       } catch (err) { alert("Error: " + err.message); }
     }
     function openDownloadModal() { document.getElementById('downloadModal').classList.remove('hidden'); renderDownloadList(); }
+    // TERMASUK renderDownloadList JUGA DIGANTI:
     function renderDownloadList() {
       const cont = document.getElementById('downloadListContainer'); cont.innerHTML = ''; const s = document.getElementById('searchDownload').value.toLowerCase();
       rawData.forEach((r, i) => {
-        if ((r.Nama_Keluarga || '').toLowerCase().includes(s)) {
+        // PERBAIKAN DI BARIS INI (Ditambah String(...))
+        if (String(r.Nama_Keluarga || '').toLowerCase().includes(s)) {
           const d = document.createElement('div'); d.className = "flex items-center p-3 border-b hover:bg-red-50";
           d.innerHTML = `<input type="checkbox" id="dl_${i}" value="${i}" class="dl-checkbox w-5 h-5 mr-4 accent-red-600"><label for="dl_${i}" class="flex-1 font-bold"><span class="text-red-700">[No. ${r.No_Kartu}]</span> ${r.Nama_Keluarga}</label>`;
           cont.appendChild(d);
