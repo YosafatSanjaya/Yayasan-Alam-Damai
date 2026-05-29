@@ -249,11 +249,11 @@
 
     class Utils {
       static sanitizeInput(str) {
-        if (!str) return "";
-        return str.replace(/[<>]/g, ""); 
+        if (str === null || str === undefined) return "";
+        return String(str).replace(/[<>]/g, ""); 
       }
       static isInvalid(val) {
-        return !val || val.trim() === "";
+        return !val || String(val).trim() === "";
       }
     }
 
