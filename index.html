@@ -110,6 +110,7 @@
         <div class="flex flex-col gap-3 mb-6">
           <button onclick="App.Data.fetch()" class="w-full bg-blue-600 hover:bg-blue-700 text-white px-4 py-3 rounded-xl text-sm font-bold transition shadow-md">⟲ SINKRONISASI SERVER</button>
           <button onclick="App.UI.openAddModal()" class="w-full bg-cyan-600 hover:bg-cyan-700 text-white px-4 py-3 rounded-xl text-sm font-bold transition shadow-md">✚ TAMBAH KELUARGA BARU</button>
+          <button onclick="App.Export.downloadDatabaseCSV()" class="w-full bg-gray-600 hover:bg-gray-700 text-white px-4 py-3 rounded-xl text-sm font-bold transition shadow-md">💾 DOWNLOAD BACKUP DB (CSV)</button>
         </div>
         <input type="text" id="searchInput" placeholder="🔍︎ Ketik No Kartu atau Nama..." onkeyup="App.UI.renderList()" class="w-full px-4 py-3 bg-gray-50 border-2 rounded-xl focus:border-blue-500 mb-4 outline-none transition">
         <div id="familyList" class="space-y-2 max-h-[50vh] overflow-y-auto pr-2 custom-scrollbar"></div>
@@ -129,10 +130,10 @@
       </div>
 
       <div id="actionButtons" class="bg-white p-4 rounded-2xl shadow-lg flex flex-wrap justify-center gap-3 hidden border-t-4 border-yellow-400">
-        <button onclick="App.UI.openEditModal()" class="bg-yellow-500 hover:bg-yellow-600 text-white px-5 py-2.5 rounded-xl font-bold shadow transition">Edit Pembayaran</button>
-        <button onclick="App.UI.toggleFullScreen()" class="bg-orange-600 hover:bg-orange-700 text-white px-5 py-2.5 rounded-xl font-bold shadow transition">Full Screen (SS)</button>
-        <button onclick="App.Export.downloadPNG()" class="bg-green-600 hover:bg-green-700 text-white px-5 py-2.5 rounded-xl font-bold shadow transition">Download PNG</button>
-        <button onclick="App.UI.openDownloadModal()" class="bg-red-600 hover:bg-red-700 text-white px-5 py-2.5 rounded-xl font-bold shadow transition">Download PDF</button>
+        <button onclick="App.UI.openEditModal()" class="bg-yellow-500 hover:bg-yellow-600 text-white px-5 py-2.5 rounded-xl font-bold shadow transition">✏️ Edit Pembayaran</button>
+        <button onclick="App.UI.toggleFullScreen()" class="bg-orange-600 hover:bg-orange-700 text-white px-5 py-2.5 rounded-xl font-bold shadow transition">📱 Full Screen (SS)</button>
+        <button onclick="App.Export.downloadPNG()" class="bg-green-600 hover:bg-green-700 text-white px-5 py-2.5 rounded-xl font-bold shadow transition">🖼️ Download PNG</button>
+        <button onclick="App.UI.openDownloadModal()" class="bg-red-600 hover:bg-red-700 text-white px-5 py-2.5 rounded-xl font-bold shadow transition">📄 Download PDF Massal</button>
       </div>
 
       <div class="overflow-x-auto bg-gray-300 p-6 rounded-2xl shadow-inner flex flex-col items-center justify-center hidden transition-all duration-300" id="previewContainer">
@@ -180,7 +181,7 @@
         </div>
         <div>
           <h3 class="font-bold gap-2">📅 Set Tanggal & Nominal Pembayaran</h3>
-          <p class="text-sm text-gray-500 mb-4">Kosongkan jika belum bayar. Nominal standar terisi otomatis.</p>
+          <p class="text-sm text-gray-500 mb-4">Kosongkan jika belum bayar. Nominal standar otomatis terisi saat tanggal dipilih.</p>
           <div id="editMonthsContainer" class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4"></div>
         </div>
       </div>
@@ -210,7 +211,7 @@
 
   <div id="downloadModal" class="fixed inset-0 bg-black bg-opacity-60 flex items-center justify-center hidden z-[70] p-4 transition-opacity">
     <div class="bg-white rounded-2xl shadow-2xl p-6 w-full max-w-2xl max-h-[90vh] flex flex-col">
-      <h2 class="text-2xl font-black text-red-700 mb-2 border-b-2 pb-4">Pilih Kartu untuk PDF</h2>
+      <h2 class="text-2xl font-black text-red-700 mb-2 border-b-2 pb-4">📄 Pilih Kartu untuk PDF</h2>
       <input type="text" id="searchDownload" placeholder=" 🔍︎ Cari nama..." onkeyup="App.UI.renderDownloadList()" class="w-full px-4 py-3 bg-gray-50 border-2 rounded-xl mb-3 outline-none focus:border-red-500">
       <div class="flex items-center mb-2 bg-red-50 p-2 rounded-lg border border-red-200">
         <input type="checkbox" id="selectAllDl" onchange="App.UI.toggleSelectAllDl()" class="w-5 h-5 mr-3 accent-red-600 cursor-pointer">
@@ -250,6 +251,7 @@
     class Utils {
       static sanitizeInput(str) {
         if (str === null || str === undefined) return "";
+        // PERBAIKAN: Paksa menjadi string dulu agar tidak error saat ketemu angka (Number)
         return String(str).replace(/[<>]/g, ""); 
       }
       static isInvalid(val) {
@@ -294,7 +296,7 @@
           App.UI.showAlert("Autentikasi bermasalah di browser ini.");
         } finally {
           btn.disabled = false;
-          btn.innerText = "MASUK SISTEM";
+          btn.innerText = "MASUK";
         }
       }
 
@@ -363,12 +365,33 @@
           State.headers = json.headers;
           State.rawData = json.data;
           
+          // PLAN B: Simpan backup lokal diam-diam ke HP/Laptop setiap berhasil fetch data
+          const backupData = {
+            headers: State.headers,
+            rawData: State.rawData,
+            lastSync: new Date().toLocaleString('id-ID')
+          };
+          localStorage.setItem('alamDamai_offline_backup', JSON.stringify(backupData));
+          
           App.UI.renderList();
           this.hitungSaldoGlobal();
         } catch (err) {
           if (err.message.includes("Sesi")) return;
-          console.error("Fetch Error Detail:", err);
-          App.UI.showAlert("Koneksi ditolak server: " + err.message);
+          
+          // PLAN B FALLBACK: Kalau gagal (gak ada internet), tarik data dari backup lokal
+          const localBackup = localStorage.getItem('alamDamai_offline_backup');
+          if (localBackup) {
+            const parsedBackup = JSON.parse(localBackup);
+            State.headers = parsedBackup.headers;
+            State.rawData = parsedBackup.rawData;
+            App.UI.renderList();
+            this.hitungSaldoGlobal();
+            
+            App.UI.showAlert(`Mode Offline Aktif 📡: Menampilkan data dari sikronisasi terakhir (${parsedBackup.lastSync}).`);
+          } else {
+            console.error("Fetch Error Detail:", err);
+            App.UI.showAlert("Koneksi ditolak server dan belum ada backup lokal: " + err.message);
+          }
         } finally {
           App.UI.hideLoading();
         }
@@ -384,10 +407,15 @@
             body: JSON.stringify(payload)
           });
           if (!response.ok) throw new Error("Gagal menyimpan ke Google Server");
+          
+          // Update backup lokal jika berhasil disave ke server
+          const backupData = { headers: State.headers, rawData: State.rawData, lastSync: new Date().toLocaleString('id-ID') };
+          localStorage.setItem('alamDamai_offline_backup', JSON.stringify(backupData));
+          
         } catch (err) {
           if (err.message.includes("Sesi")) return;
           console.error("Save Error Detail:", err);
-          App.UI.showAlert("Gagal menyimpan: " + err.message + " (Data hanya tersimpan sementara di HP/Laptop ini)");
+          App.UI.showAlert("Gagal menyimpan: " + err.message + " (Data hanya tersimpan sementara di perangkat ini)");
         } finally {
           App.UI.hideLoading();
         }
@@ -491,7 +519,7 @@
         const alertBox = document.getElementById('globalAlert');
         document.getElementById('globalAlertText').innerText = msg;
         alertBox.classList.remove('hidden');
-        setTimeout(() => this.hideAlert(), 5000); // Tampil lebih lama kalau error
+        setTimeout(() => this.hideAlert(), 5000); 
       }
 
       static hideAlert() {
@@ -622,13 +650,29 @@
           if (h.includes('_202')) {
             const div = document.createElement('div'); div.className = "flex flex-col border p-3 rounded-xl bg-gray-50 transition focus-within:border-blue-400";
             const l = document.createElement('label'); l.className = "text-xs font-bold mb-2 uppercase"; l.innerText = h.replace('_', ' ');
-            const id = document.createElement('input'); id.type = "date"; id.className = "text-sm border rounded-lg p-1.5 mb-2 w-full outline-none"; id.id = `input_date_${h}`;
-            const inN = document.createElement('input'); inN.type = "number"; inN.placeholder = `Rp ${State.targetIuranSaatIni}`; inN.className = "text-sm border rounded-lg p-1.5 w-full font-semibold text-green-700 outline-none"; inN.id = `input_nom_${h}`;
+            
+            const id = document.createElement('input'); 
+            id.type = "date"; 
+            id.className = "text-sm border rounded-lg p-1.5 mb-2 w-full outline-none"; 
+            id.id = `input_date_${h}`;
+            
+            const inN = document.createElement('input'); 
+            inN.type = "number"; 
+            inN.placeholder = `Rp ${State.targetIuranSaatIni}`; 
+            inN.className = "text-sm border rounded-lg p-1.5 w-full font-semibold text-green-700 outline-none"; 
+            inN.id = `input_nom_${h}`;
             
             let v = d[h] || '', t = '', n = v; 
             if (v.includes('|')) { const p = v.split('|'); t = p[0]; n = p[1]; }
             id.value = t; inN.value = n; 
             
+            // FITUR BARU: AUTO-FILL NOMINAL UNTUK MAMI SAAT MEMILIH TANGGAL
+            id.addEventListener('change', () => {
+              if (id.value && !inN.value) {
+                inN.value = State.targetIuranSaatIni; // Otomatis isi (misal 40000)
+              }
+            });
+
             div.appendChild(l); div.appendChild(id); div.appendChild(inN); 
             c.appendChild(div);
           }
@@ -743,6 +787,34 @@
           btn.innerText = "⏬ Unduh PDF Gabungan"; 
           btn.disabled = false; 
         }
+      }
+
+      // PLAN C: TOMBOL DOWNLOAD DATABASE CSV 
+      static downloadDatabaseCSV() {
+        if (State.rawData.length === 0) return App.UI.showAlert("Data kosong, tidak ada yang bisa dibackup.");
+        
+        // Buat baris header
+        let csvContent = "data:text/csv;charset=utf-8," + State.headers.join(",") + "\n";
+        
+        // Buat baris data
+        State.rawData.forEach(row => {
+          let rowArray = State.headers.map(h => {
+             let cellData = row[h] || "";
+             // Bersihkan koma atau enter agar tidak merusak format CSV
+             return `"${String(cellData).replace(/"/g, '""')}"`;
+          });
+          csvContent += rowArray.join(",") + "\n";
+        });
+        
+        // Proses download otomatis
+        const encodedUri = encodeURI(csvContent);
+        const link = document.createElement("a");
+        link.setAttribute("href", encodedUri);
+        link.setAttribute("download", `Backup_DB_AlamDamai_${new Date().toLocaleDateString('id-ID').replace(/\//g, '-')}.csv`);
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+        App.UI.showAlert("Database berhasil didownload!");
       }
     }
 
