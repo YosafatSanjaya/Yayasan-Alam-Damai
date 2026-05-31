@@ -3,151 +3,365 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Portal Warga Alam Damai</title>
+  <title>Alam Damai</title>
   <link rel="preload" as="image" href="assets/img/logo.png">
   <script src="https://cdn.tailwindcss.com"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  
   <style>
-    .card-table { border-collapse: collapse; width: 100%; }
-    .card-table th, .card-table td { border: 1px solid #18c3e1; padding: 6px 12px; text-align: center; font-size: 0.875rem; }
-    .card-table th { background-color: #e0f7fa; color: #0c4a6e; font-weight: 800; text-transform: uppercase; }
-    .card-table td { font-weight: 500; color: #334155; }
-    .print-card { box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1); background-image: radial-gradient(#f8fafc 10%, transparent 10%); background-size: 20px 20px; }
+    /* Transisi Halus Global */
+    * { transition: all 0.3s ease-in-out; }
+    
+    /* Latar Belakang Elegan (Soft Gradient) */
+    body {
+      background: linear-gradient(135deg, #f8fafc 0%, #e2e8f0 100%);
+      min-height: 100vh;
+    }
+
+    /* Style Tabel Elegan */
+    .card-table { border-collapse: collapse; width: 100%; border-radius: 12px; overflow: hidden; }
+    .card-table th, .card-table td { border: 1px solid #cbd5e1; padding: 10px 12px; text-align: center; font-size: 0.9rem; }
+    .card-table th { background-color: #1e3a8a; color: #ffffff; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; }
+    .card-table td { font-weight: 600; color: #334155; background-color: #ffffff; }
+    .card-table tr:nth-child(even) td { background-color: #f8fafc; }
+
+    /* Desain Kartu Kertas Premium */
+    .print-card { 
+      box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.15); 
+      background-color: #ffffff;
+      background-image: radial-gradient(#f1f5f9 10%, transparent 10%); 
+      background-size: 20px 20px; 
+      border-radius: 1.5rem;
+    }
+
+    /* Custom Scrollbar yang Lembut */
+    .custom-scrollbar::-webkit-scrollbar { width: 8px; }
+    .custom-scrollbar::-webkit-scrollbar-track { background: #f1f1f1; border-radius: 10px; }
+    .custom-scrollbar::-webkit-scrollbar-thumb { background: #94a3b8; border-radius: 10px; }
+    .custom-scrollbar::-webkit-scrollbar-thumb:hover { background: #64748b; }
+
+    /* Animasi Shimmer untuk Loading */
+    .animate-pulse-slow { animation: pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite; }
   </style>
 </head>
-<body class="bg-gray-100 min-h-screen text-gray-800 font-sans p-4 lg:p-8" id="mainBody">
 
-  <div id="cloudLoading" class="fixed inset-0 bg-white z-[110] flex flex-col items-center justify-center">
-    <img src="assets/img/logo.png" class="h-20 mb-4 animate-bounce">
-    <h2 class="text-xl font-bold text-blue-800" id="loadingText">Menghubungkan ke Server Yayasan...</h2>
+<body class="text-gray-800 font-sans p-4 lg:p-8" id="mainBody">
+
+  <div id="cloudLoading" class="fixed inset-0 bg-white/95 backdrop-blur-md z-[110] flex flex-col items-center justify-center">
+    <div class="p-8 rounded-3xl bg-blue-50 border border-blue-100 shadow-2xl text-center">
+      <img src="assets/img/logo.png" class="h-28 mb-6 mx-auto animate-bounce drop-shadow-lg" onerror="this.style.display='none'">
+      <h2 class="text-2xl font-black text-blue-900 mb-2 tracking-wide">YAYASAN ALAM DAMAI</h2>
+      <p class="text-lg font-medium text-blue-600 animate-pulse-slow" id="loadingText">Menyiapkan Portal Warga...</p>
+    </div>
   </div>
 
-  <div class="max-w-7xl mx-auto flex flex-col lg:flex-row gap-6 relative" id="mainApp">
+  <div class="max-w-6xl mx-auto flex flex-col items-center gap-8 relative opacity-0 pointer-events-none" id="mainApp">
     
-    <div id="adminPanel" class="w-full lg:w-1/3 flex flex-col gap-4">
-      <div class="bg-white p-6 rounded-2xl shadow-lg border-t-4 border-blue-500 text-center">
-        <img src="assets/img/logo.png" class="h-24 mx-auto mb-4">
-        <h2 class="text-xl font-black text-blue-900 mb-6">Pengecekan Kartu Iuran</h2>
-        <input type="text" id="searchInput" placeholder="🔍 Masukkan Nama Anda..." onkeyup="renderList()" class="w-full px-4 py-3 bg-gray-50 border-2 rounded-xl focus:border-blue-500 mb-4 outline-none text-lg text-center font-bold">
-        <div id="familyList" class="space-y-2 max-h-[50vh] overflow-y-auto"></div>
+    <header class="w-full text-center mt-6">
+      <img src="assets/img/logo.png" class="h-24 mx-auto mb-4 drop-shadow-md" onerror="this.style.display='none'">
+      <h1 class="text-4xl md:text-5xl font-black text-blue-900 tracking-tight drop-shadow-sm">Portal Iuran Warga</h1>
+      <p class="mt-3 text-lg text-gray-600 font-medium">Cek status pembayaran keluarga Anda dengan mudah</p>
+    </header>
+
+    <div class="w-full max-w-2xl bg-white p-6 md:p-10 rounded-[2rem] shadow-2xl border-t-8 border-amber-400 relative z-10">
+      <h2 class="text-2xl md:text-3xl font-bold text-center text-gray-800 mb-6">🔍 Cari Kartu Keluarga</h2>
+      
+      <div class="relative">
+        <input type="text" id="searchInput" placeholder="Ketik nama Anda di sini..." autocomplete="off"
+          class="w-full pl-6 pr-6 py-5 bg-gray-50 border-2 border-gray-200 rounded-2xl focus:border-blue-600 focus:ring-4 focus:ring-blue-100 outline-none text-xl md:text-2xl text-center font-bold text-blue-900 placeholder-gray-400 shadow-inner">
       </div>
+      
+      <p id="searchHint" class="text-center text-gray-500 font-medium mt-4 text-sm md:text-base">Ketik minimal 3 huruf agar nama muncul</p>
+      
+      <div id="familyList" class="mt-4 space-y-3 max-h-[40vh] overflow-y-auto px-2 custom-scrollbar"></div>
     </div>
 
-    <div id="previewPanel" class="w-full lg:w-2/3 flex flex-col gap-4">
-      <div id="actionButtons" class="bg-white p-4 rounded-2xl shadow-lg flex justify-center gap-3 hidden">
-        <button onclick="downloadPNG()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-5 py-2.5 rounded-xl font-bold shadow">🖼️ Unduh Kartu Saya (PNG)</button>
+    <div id="previewPanel" class="w-full flex flex-col items-center gap-6 hidden opacity-0 transform translate-y-10 transition-all duration-700">
+      
+      <div id="actionButtons" class="bg-white px-8 py-5 rounded-2xl shadow-xl border border-gray-100 flex justify-center w-full max-w-2xl">
+        <button onclick="App.Export.downloadPNG()" class="w-full md:w-auto bg-gradient-to-r from-blue-600 to-indigo-700 hover:from-blue-700 hover:to-indigo-800 text-white px-8 py-4 rounded-xl font-bold shadow-lg shadow-blue-500/30 text-lg flex items-center justify-center gap-3 transform hover:scale-105">
+          <span class="text-2xl">⬇️</span> Simpan Gambar Kartu
+        </button>
       </div>
 
-      <div class="overflow-x-auto bg-gray-300 p-6 rounded-2xl shadow-inner flex-col items-center justify-center hidden" id="previewContainer">
-        <div id="cardPreview" class="print-card bg-white w-[850px] min-w-[850px] p-10 rounded-xl border-[6px] border-blue-500 relative">
-          <div class="flex justify-between border-b-[3px] border-blue-500 pb-5 mb-6">
-            <img src="assets/img/logo.png" class="h-24 w-24 object-contain" onerror="this.style.display='none'">
+      <div class="md:hidden text-amber-600 font-bold bg-amber-50 px-6 py-3 rounded-full shadow-sm text-sm border border-amber-200 animate-pulse">
+        👉 Geser kartu ke samping untuk melihat penuh
+      </div>
+
+      <div class="w-full overflow-x-auto custom-scrollbar pb-6" id="previewContainer">
+        
+        <div id="cardPreview" class="print-card bg-white w-[850px] min-w-[850px] p-12 border-[8px] border-blue-900 relative mx-auto">
+          
+          <div class="flex justify-between items-end border-b-[4px] border-blue-900 pb-6 mb-8">
+            <img src="assets/img/logo.png" class="h-28 w-28 object-contain drop-shadow-md" onerror="this.style.display='none'">
             <div class="text-center flex-1">
-              <h1 class="text-4xl font-black text-blue-800 uppercase tracking-[0.2em] mb-1">Kartu Iuran</h1>
-              <h2 class="text-2xl font-bold text-gray-700">YAYASAN ALAM DAMAI</h2>
+              <h1 class="text-5xl font-black text-amber-500 uppercase tracking-[0.2em] mb-2" style="-webkit-text-stroke: 1px #1e3a8a;">Kartu Iuran</h1>
+              <h2 class="text-3xl font-extrabold text-blue-900 tracking-wide">YAYASAN ALAM DAMAI</h2>
             </div>
-            <div class="w-24"></div>
+            <div class="w-28"></div> </div>
+
+          <div class="bg-blue-50 p-6 rounded-2xl border border-blue-100 mb-8 shadow-inner">
+            <div class="grid grid-cols-12 gap-y-3 text-lg">
+              <div class="col-span-3 font-bold text-gray-500 uppercase tracking-wide text-sm flex items-center">No. Kartu</div>
+              <div class="col-span-9 font-black text-2xl text-blue-900">: <span id="lblNoKartu"></span></div>
+              
+              <div class="col-span-3 font-bold text-gray-500 uppercase tracking-wide text-sm flex items-center">Nama</div>
+              <div class="col-span-9 font-bold text-xl text-gray-800">: <span id="lblNama"></span></div>
+              
+              <div class="col-span-3 font-bold text-gray-500 uppercase tracking-wide text-sm flex items-center">No. Telepon</div>
+              <div class="col-span-9 font-semibold text-lg text-gray-700">: <span id="lblNoTelp"></span></div>
+              
+              <div class="col-span-3 font-bold text-gray-500 uppercase tracking-wide text-sm flex items-center">Alamat</div>
+              <div class="col-span-9 font-semibold text-lg text-gray-700">: <span id="lblAlamat"></span></div>
+              
+              <div class="col-span-3 font-bold text-gray-500 uppercase tracking-wide text-sm flex items-center">Anggota</div>
+              <div class="col-span-9 font-semibold text-lg text-gray-700">: <span id="lblAnggota"></span></div>
+            </div>
           </div>
-          <div class="grid grid-cols-12 gap-y-2 mb-6 text-base">
-            <div class="col-span-2 font-bold text-gray-700">No. Kartu</div><div class="col-span-10 font-semibold text-blue-900">: <span id="lblNoKartu"></span></div>
-            <div class="col-span-2 font-bold text-gray-700">No. Telepon</div><div class="col-span-10 font-semibold text-blue-900">: <span id="lblNoTelp"></span></div>
-            <div class="col-span-2 font-bold text-gray-700">Nama</div><div class="col-span-10 font-semibold text-blue-900">: <span id="lblNama"></span></div>
-            <div class="col-span-2 font-bold text-gray-700">Alamat</div><div class="col-span-10 font-semibold text-blue-900">: <span id="lblAlamat"></span></div>
-            <div class="col-span-2 font-bold text-gray-700">Anggota</div><div class="col-span-10 font-semibold text-blue-900">: <span id="lblAnggota"></span></div>
-          </div>
-          <table class="card-table mb-8 bg-white">
+
+          <table class="card-table mb-10 shadow-sm">
             <thead>
-              <tr><th class="w-1/4 py-3">Bulan</th><th class="w-1/4 py-3">Tahun 2026</th><th class="w-1/4 py-3">Tahun 2027</th><th class="w-1/4 py-3">Tahun 2028</th></tr>
+              <tr>
+                <th class="w-1/4 py-4 text-lg">Bulan</th>
+                <th class="w-1/4 py-4 text-lg">Tahun 2026</th>
+                <th class="w-1/4 py-4 text-lg">Tahun 2027</th>
+                <th class="w-1/4 py-4 text-lg">Tahun 2028</th>
+              </tr>
             </thead>
             <tbody id="tableBody"></tbody>
           </table>
-          <div class="flex justify-between text-center mt-4 px-10">
-            <div><p class="font-bold mb-2">KETUA</p><img src="assets/img/tt_ketua.png" class="h-20" onerror="this.style.display='none'"><p class="underline font-bold mt-2">( Bpk. Manullang )</p></div>
-            <div><p class="font-bold mb-2">SEKRETARIS</p><img src="assets/img/tt_sekretaris.png" class="h-20" onerror="this.style.display='none'"><p class="underline font-bold mt-2">( Ibu Lucy )</p></div>
-            <div><p class="font-bold mb-2">BENDAHARA</p><img src="assets/img/tt_bendahara.png" class="h-20" onerror="this.style.display='none'"><p class="underline font-bold mt-2">( Ibu Suzan )</p></div>
+
+          <div class="flex justify-between text-center mt-8 px-12 pb-4">
+            <div><p class="font-bold text-gray-500 mb-2 tracking-widest text-sm">KETUA</p><img src="assets/img/tt_ketua.png" class="h-20 mx-auto" onerror="this.style.display='none'"><p class="underline font-bold text-lg mt-2 text-blue-900">Bpk. Manullang</p></div>
+            <div><p class="font-bold text-gray-500 mb-2 tracking-widest text-sm">SEKRETARIS</p><img src="assets/img/tt_sekretaris.png" class="h-20 mx-auto" onerror="this.style.display='none'"><p class="underline font-bold text-lg mt-2 text-blue-900">Ibu Lucy</p></div>
+            <div><p class="font-bold text-gray-500 mb-2 tracking-widest text-sm">BENDAHARA</p><img src="assets/img/tt_bendahara.png" class="h-20 mx-auto" onerror="this.style.display='none'"><p class="underline font-bold text-lg mt-2 text-blue-900">Ibu Suzan</p></div>
           </div>
         </div>
       </div>
+      
     </div>
+    
+    <footer class="w-full text-center pb-8 pt-4">
+      <p class="text-gray-400 font-medium text-sm">© 2026 Yayasan Alam Damai.</p>
+    </footer>
+
   </div>
 
   <script>
-    // ⚠️ PASTE URL WEB APP DARI GOOGLE APPS SCRIPT DI SINI! ⚠️
-    const SCRIPT_URL = "https://script.google.com/macros/s/AKfycbwbvqOHUD-TV4NxzDE6z4fbgMWwHmbweih-lXQsjNcClNXfe1XAlTQVJsLE6JMsmwrynA/exec"; 
+    /**
+     * ==========================================
+     * CLEAN CODE ARCHITECTURE - PUBLIC PORTAL
+     * ==========================================
+     */
     
-    const listBulan = ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"];
-    let rawData = []; let headers = []; let currentIndex = -1;
-
-    // Otomatis tarik data saat web dibuka Warga
-    window.onload = async () => {
-      try {
-        const response = await fetch(SCRIPT_URL);
-        const json = await response.json();
-        headers = json.headers; rawData = json.data;
-        document.getElementById('cloudLoading').classList.add('hidden');
-      } catch (err) {
-        alert("Gagal konek server. Coba muat ulang halaman.");
-      }
+    const CONFIG = {
+      API_URL: "https://script.google.com/macros/s/AKfycbwbvqOHUD-TV4NxzDE6z4fbgMWwHmbweih-lXQsjNcClNXfe1XAlTQVJsLE6JMsmwrynA/exec",
+      BULAN: ["Januari", "Februari", "Maret", "April", "Mei", "Juni", "Juli", "Agustus", "September", "Oktober", "November", "Desember"]
     };
 
-function renderList() {
-      const cont = document.getElementById('familyList'); cont.innerHTML = '';
-      const s = document.getElementById('searchInput').value.toLowerCase();
-      if(s.length < 3) return; // Warga harus ketik minimal 3 huruf biar gak nebak semua nama
+    const State = {
+      rawData: [],
+      headers: [],
+      currentIndex: -1
+    };
 
-      rawData.forEach((r, i) => {
-        // PERBAIKAN DI BARIS INI (Ditambah String(...))
-        if (String(r.Nama_Keluarga || '').toLowerCase().includes(s)) {
-          const d = document.createElement('div');
-          d.className = "p-4 border-2 rounded-xl cursor-pointer hover:bg-blue-50 text-left";
-          d.innerHTML = `<p class="font-bold text-sm text-blue-900">${r.Nama_Keluarga}</p>`;
-          d.onclick = () => selectFamily(i); cont.appendChild(d);
+    class Utils {
+      // Membersihkan XSS dan merubah tipe angka menjadi string
+      static sanitizeInput(str) {
+        if (str === null || str === undefined) return "";
+        return String(str).replace(/[<>]/g, ""); 
+      }
+      static formatRupiah(angka) {
+        return new Intl.NumberFormat('id-ID').format(angka);
+      }
+    }
+
+    class DataService {
+      static async fetch() {
+        try {
+          const response = await fetch(CONFIG.API_URL);
+          if (!response.ok) throw new Error("Koneksi ditolak server.");
+          const json = await response.json();
+          State.headers = json.headers;
+          State.rawData = json.data;
+          
+          App.UI.unlockApp();
+        } catch (err) {
+          document.getElementById('loadingText').innerText = "Gagal terhubung. Pastikan internet Anda aktif lalu refresh halaman.";
+          document.getElementById('loadingText').classList.replace("text-blue-600", "text-red-600");
+          document.getElementById('loadingText').classList.remove("animate-pulse-slow");
         }
-      });
+      }
     }
 
-    function selectFamily(i) {
-      currentIndex = i; 
-      document.getElementById('actionButtons').classList.remove('hidden');
-      document.getElementById('previewContainer').classList.remove('hidden');
-      document.getElementById('previewContainer').classList.add('flex');
-      updateCardPreview();
+    class UIController {
+      static initListeners() {
+        const searchInput = document.getElementById('searchInput');
+        searchInput.addEventListener('input', () => this.renderList());
+      }
+
+      static unlockApp() {
+        const loader = document.getElementById('cloudLoading');
+        const mainApp = document.getElementById('mainApp');
+        
+        loader.style.opacity = '0';
+        setTimeout(() => {
+          loader.classList.add('hidden');
+          mainApp.classList.remove('opacity-0', 'pointer-events-none');
+          mainApp.classList.add('opacity-100');
+        }, 500);
+      }
+
+      static renderList() {
+        const cont = document.getElementById('familyList'); 
+        const hint = document.getElementById('searchHint');
+        const s = document.getElementById('searchInput').value.toLowerCase().trim(); 
+        
+        cont.innerHTML = '';
+        
+        if (s.length < 3) {
+          hint.innerText = s.length === 0 ? "Ketik minimal 3 huruf agar nama muncul" : "Ketik sedikit lagi...";
+          hint.classList.replace("text-green-600", "text-gray-500");
+          return;
+        }
+
+        let foundCount = 0;
+        State.rawData.forEach((r, i) => {
+          if (String(r.Nama_Keluarga || '').toLowerCase().includes(s)) {
+            foundCount++;
+            const d = document.createElement('button');
+            d.className = "w-full p-5 bg-white border border-gray-200 rounded-2xl cursor-pointer hover:bg-blue-50 hover:border-blue-300 transition shadow-sm text-left flex items-center justify-between group";
+            d.innerHTML = `
+              <div>
+                <p class="font-black text-xl text-blue-900 group-hover:text-blue-700">${Utils.sanitizeInput(r.Nama_Keluarga)}</p>
+                <p class="text-sm text-gray-500 font-medium mt-1">No. Kartu: <span class="font-bold">${Utils.sanitizeInput(r.No_Kartu)}</span></p>
+              </div>
+              <div class="bg-amber-100 text-amber-700 px-4 py-2 rounded-xl font-bold text-sm group-hover:bg-amber-400 group-hover:text-white transition">Lihat Kartu ➔</div>
+            `;
+            d.onclick = () => this.selectFamily(i); 
+            cont.appendChild(d);
+          }
+        });
+
+        if (foundCount > 0) {
+          hint.innerText = `Ditemukan ${foundCount} nama. Silakan klik salah satu.`;
+          hint.classList.replace("text-gray-500", "text-green-600");
+        } else {
+          hint.innerText = "Maaf, nama tidak ditemukan di database.";
+          hint.classList.replace("text-green-600", "text-red-500");
+        }
+      }
+
+      static selectFamily(i) {
+        State.currentIndex = i; 
+        const panel = document.getElementById('previewPanel');
+        
+        // Animasi kemunculan kartu
+        panel.classList.remove('hidden');
+        setTimeout(() => {
+          panel.classList.remove('opacity-0', 'translate-y-10');
+          panel.classList.add('opacity-100', 'translate-y-0');
+          
+          // UX Lansia: Otomatis scroll perlahan ke bagian kartu setelah diklik
+          panel.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }, 50);
+        
+        this.updateCardPreview();
+      }
+
+      static updateCardPreview() {
+        const d = State.rawData[State.currentIndex];
+        document.getElementById('lblNoKartu').innerText = d.No_Kartu || '-'; 
+        document.getElementById('lblNoTelp').innerText = d.No_Telp || '-';
+        document.getElementById('lblNama').innerText = d.Nama_Keluarga || '-'; 
+        document.getElementById('lblAlamat').innerText = d.Alamat || '-';
+        document.getElementById('lblAnggota').innerText = d.Anggota || '-';
+
+        const tb = document.getElementById('tableBody'); tb.innerHTML = '';
+        CONFIG.BULAN.forEach(b => {
+          const tr = document.createElement('tr'); 
+          const tdb = document.createElement('td');
+          tdb.innerText = b; 
+          tdb.className = "font-black text-left text-blue-900 text-base tracking-wide"; 
+          tr.appendChild(tdb);
+          
+          [2026, 2027, 2028].forEach(y => {
+            const col = `${b}_${y}`; 
+            const td = document.createElement('td');
+            if (State.headers.includes(col)) {
+              let v = d[col] || '', t = '', n = v;
+              if (v.includes('|')) { const p = v.split('|'); t = p[0]; n = p[1]; }
+              
+              if (t && n) {
+                const dt = new Date(t); 
+                td.innerHTML = `
+                  <div class="flex flex-col items-center justify-center">
+                    <span class="text-[11px] font-bold text-gray-500 mb-1">TGL: ${dt.getDate()}/${dt.getMonth()+1}/${dt.getFullYear()}</span>
+                    <span class="font-black text-blue-700 bg-blue-100 px-3 py-1.5 rounded-lg text-sm border border-blue-200 shadow-inner">Rp ${Utils.formatRupiah(n)}</span>
+                  </div>`;
+              } else if (n) {
+                td.innerHTML = `
+                  <div class="flex flex-col items-center justify-center">
+                    <span class="text-xs font-black text-green-600 mb-1">✔ LUNAS</span>
+                    <span class="font-bold text-gray-700 text-sm">Rp ${Utils.formatRupiah(n)}</span>
+                  </div>`;
+              } else {
+                td.innerHTML = `<span class="block w-full text-gray-300 font-black">-</span>`;
+              }
+            } else {
+              td.innerHTML = `<span class="block w-full text-gray-300 font-black">-</span>`;
+            }
+            tr.appendChild(td);
+          }); 
+          tb.appendChild(tr);
+        });
+      }
     }
 
-    function updateCardPreview() {
-      const d = rawData[currentIndex];
-      document.getElementById('lblNoKartu').innerText = d.No_Kartu || '-'; document.getElementById('lblNoTelp').innerText = d.No_Telp || '-';
-      document.getElementById('lblNama').innerText = d.Nama_Keluarga || '-'; document.getElementById('lblAlamat').innerText = d.Alamat || '-';
-      document.getElementById('lblAnggota').innerText = d.Anggota || '-';
-
-      const tb = document.getElementById('tableBody'); tb.innerHTML = '';
-      listBulan.forEach(b => {
-        const tr = document.createElement('tr'); const tdb = document.createElement('td');
-        tdb.innerText = b; tdb.className = "font-bold bg-gray-50 text-left text-blue-900"; tr.appendChild(tdb);
-        [2026, 2027, 2028].forEach(y => {
-          const col = `${b}_${y}`; const td = document.createElement('td');
-          if (headers.includes(col)) {
-            let v = d[col] || '', t = '', n = v; if (v.includes('|')) { const p = v.split('|'); t = p[0]; n = p[1]; }
-            if (t && n) {
-              const dt = new Date(t); td.innerHTML = `<span class="font-extrabold text-blue-700 bg-blue-50 px-1 py-1 rounded text-xs">(${dt.getDate()}/${dt.getMonth()+1}) Rp.${n}</span>`;
-            } else if (n) td.innerHTML = `<span class="text-green-600 font-bold text-xs">Lunas<br>(Rp ${n})</span>`;
-            else td.innerHTML = `-`;
-          } else td.innerHTML = `-`;
-          tr.appendChild(td);
-        }); tb.appendChild(tr);
-      });
+    class ExportController {
+      static async downloadPNG() {
+        const btn = document.querySelector('#actionButtons button');
+        const originalText = btn.innerHTML;
+        btn.innerHTML = "⏳ Memproses Gambar...";
+        btn.disabled = true;
+        
+        try {
+          // Temporarily fix scaling issues on mobile before capture
+          window.scrollTo(0,0); 
+          const previewElement = document.getElementById('cardPreview');
+          
+          const canvas = await html2canvas(previewElement, { 
+            scale: 2, 
+            backgroundColor: "#ffffff",
+            logging: false
+          });
+          
+          const link = document.createElement('a'); 
+          link.download = `Kartu_Iuran_${Utils.sanitizeInput(State.rawData[State.currentIndex].Nama_Keluarga).replace(/\s/g, '_')}.png`; 
+          link.href = canvas.toDataURL('image/png'); 
+          document.body.appendChild(link); 
+          link.click(); 
+          document.body.removeChild(link);
+        } catch (err) { 
+          alert("Mohon maaf, terjadi kendala saat mengunduh gambar. Silakan coba perangkat lain."); 
+        } finally {
+          btn.innerHTML = originalText;
+          btn.disabled = false;
+        }
+      }
     }
 
-    async function downloadPNG() {
-      const btn = document.querySelector('#actionButtons button');
-      btn.innerText = "⏳ Sedang menyiapkan...";
-      try {
-        const canvas = await html2canvas(document.getElementById('cardPreview'), { scale: 2 });
-        const link = document.createElement('a'); link.download = `Kartu_Iuran_Saya.png`; link.href = canvas.toDataURL('image/png'); document.body.appendChild(link); link.click(); document.body.removeChild(link);
-      } catch (err) { alert("Error: " + err.message); }
-      btn.innerText = "🖼️ Unduh Kartu Saya (PNG)";
-    }
+    // MAIN APP INITIATOR
+    const App = {
+      Data: DataService,
+      UI: UIController,
+      Export: ExportController
+    };
+
+    window.onload = () => {
+      App.UI.initListeners();
+      App.Data.fetch();
+    };
   </script>
 </body>
 </html>
