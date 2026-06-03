@@ -867,10 +867,10 @@
     };
 
      /* ---------------------------------------------------
-       4. THEME MANAGER (SISTEM TEMA GEREJAWI)
+       4. THEME MANAGER (SISTEM TEMA GEREJAWI & NASIONAL)
     --------------------------------------------------- */
-    // SETTING: Ubah ke 'natal', 'paskah', 'pantekosta', atau 'otomatis'
-    const TEMA_AKTIF = 'natal'; 
+    // SETTING: Ubah ke 'natal', 'paskah', 'agustusan', atau 'otomatis'
+    const TEMA_AKTIF = 'agustusan'; 
 
     function terapkanTema() {
       const container = document.getElementById('theme-container');
@@ -880,38 +880,80 @@
       if (tema === 'otomatis') {
         const bulanSekarang = new Date().getMonth() + 1; // 1-12
         if (bulanSekarang === 12) tema = 'natal';
-        else if (bulanSekarang === 1) tema = 'tahun-baru';
-        else if (bulanSekarang === 4) tema = 'paskah'; // Perkiraan April
+        else if (bulanSekarang === 4) tema = 'paskah'; // April
+        else if (bulanSekarang === 8) tema = 'agustusan'; // Agustus
         else tema = 'default';
       }
 
-      // EKSEKUSI TEMA NATAL
+      // ================= TEMA NATAL =================
       if (tema === 'natal') {
-        // 1. Buat Bola Natal (Merah & Hijau) menggunakan icon/gambar
         container.innerHTML += `
           <img src="https://cdn-icons-png.flaticon.com/512/2360/2360930.png" class="ornament ornament-left" alt="Bola Natal Merah">
           <img src="https://cdn-icons-png.flaticon.com/512/2360/2360918.png" class="ornament ornament-right" alt="Bola Natal Hijau">
         `;
-
-        // 2. Buat Efek Salju (50 partikel)
         for (let i = 0; i < 50; i++) {
           let salju = document.createElement('div');
           salju.classList.add('snowflake');
-          
-          // Randomisasi ukuran, posisi, dan kecepatan salju
-          let size = Math.random() * 6 + 2; // ukuran 2px - 8px
+          let size = Math.random() * 6 + 2; 
           salju.style.width = size + 'px';
           salju.style.height = size + 'px';
           salju.style.left = Math.random() * 100 + 'vw';
-          salju.style.animationDuration = Math.random() * 3 + 2 + 's'; // durasi 2-5 detik jatuh
-          salju.style.animationDelay = Math.random() * 5 + 's'; // delay agar tidak turun bersamaan
-          
+          salju.style.animationDuration = Math.random() * 3 + 2 + 's';
+          salju.style.animationDelay = Math.random() * 5 + 's';
           container.appendChild(salju);
         }
       } 
-      // Siapkan untuk tema lain di masa depan
+      
+      // ================= TEMA PASKAH =================
       else if (tema === 'paskah') {
-        // Logika tema paskah di sini (misal: daun palem, salib, dll)
+        // Hiasan Pojok: Salib & Keranjang Paskah
+        container.innerHTML += `
+          <img src="https://cdn-icons-png.flaticon.com/512/384/384065.png" class="ornament ornament-left" style="width: 45px;" alt="Salib">
+          <img src="https://cdn-icons-png.flaticon.com/512/2099/2099187.png" class="ornament ornament-right" style="width: 55px;" alt="Telur Paskah">
+        `;
+        // Hujan Telur Warna Warni / Bunga Pastel
+        const warnaPaskah = ['#FFB6C1', '#87CEFA', '#98FB98', '#FFFACD', '#DDA0DD'];
+        for (let i = 0; i < 30; i++) {
+          let telur = document.createElement('div');
+          telur.classList.add('snowflake');
+          let size = Math.random() * 8 + 6; 
+          telur.style.width = size + 'px';
+          telur.style.height = (size * 1.3) + 'px'; // Bentuk oval/telur
+          telur.style.borderRadius = '50% 50% 50% 50% / 60% 60% 40% 40%';
+          telur.style.background = warnaPaskah[Math.floor(Math.random() * warnaPaskah.length)];
+          telur.style.opacity = '0.85';
+          telur.style.filter = 'none'; // Hilangkan blur salju
+          telur.style.left = Math.random() * 100 + 'vw';
+          telur.style.animationDuration = Math.random() * 4 + 3 + 's';
+          telur.style.animationDelay = Math.random() * 5 + 's';
+          container.appendChild(telur);
+        }
+      }
+
+      // ================= TEMA 17 AGUSTUS =================
+      else if (tema === 'agustusan') {
+        // Hiasan Pojok: Bendera Merah Putih
+        container.innerHTML += `
+          <img src="https://cdn-icons-png.flaticon.com/512/323/323321.png" class="ornament ornament-left" style="width: 55px;" alt="Bendera">
+          <img src="https://cdn-icons-png.flaticon.com/512/323/323321.png" class="ornament ornament-right" style="width: 55px; transform: scaleX(-1);" alt="Bendera">
+        `;
+        // Hujan Confetti Merah Putih
+        for (let i = 0; i < 60; i++) {
+          let confetti = document.createElement('div');
+          confetti.classList.add('snowflake');
+          let size = Math.random() * 6 + 4; 
+          confetti.style.width = size + 'px';
+          confetti.style.height = (size * 2) + 'px'; // Bentuk persegi panjang seperti kertas
+          confetti.style.borderRadius = '2px';
+          confetti.style.background = Math.random() > 0.5 ? '#EF4444' : '#FFFFFF'; // Merah atau Putih
+          confetti.style.boxShadow = '0 1px 3px rgba(0,0,0,0.2)';
+          confetti.style.opacity = '0.9';
+          confetti.style.filter = 'none';
+          confetti.style.left = Math.random() * 100 + 'vw';
+          confetti.style.animationDuration = Math.random() * 3 + 2 + 's';
+          confetti.style.animationDelay = Math.random() * 5 + 's';
+          container.appendChild(confetti);
+        }
       }
     }
 
