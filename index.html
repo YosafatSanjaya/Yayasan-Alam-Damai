@@ -64,10 +64,44 @@
     #bgSlide { transition: background-image 1.5s ease-in-out; background-color: #1e3a8a; }
     .dark-mode-toggle { background: rgba(255,255,255,0.2); backdrop-filter: blur(4px); border-radius: 9999px; padding: 8px 16px; font-weight: bold; transition: all 0.2s; }
     .dark-mode-toggle:hover { background: rgba(255,255,255,0.3); transform: scale(1.02); }
+
+     /* ================= TEMA DINAMIS (NATAL, DLL) ================= */
+    /* Container untuk elemen yang tidak boleh mengganggu klik mouse */
+    .theme-overlay {
+      position: fixed; inset: 0; pointer-events: none; z-index: 9999; overflow: hidden;
+    }
+
+    /* Animasi Bola Natal Mengayun */
+    .ornament {
+      position: absolute; top: -10px; width: 60px; transform-origin: top center;
+      animation: swing 3s ease-in-out infinite alternate;
+      filter: drop-shadow(0 10px 15px rgba(0,0,0,0.5));
+    }
+    .ornament-left { left: 5%; animation-delay: 0s; }
+    .ornament-right { right: 5%; animation-delay: 1.5s; width: 50px; }
+    
+    @keyframes swing {
+      0% { transform: rotate(10deg); }
+      100% { transform: rotate(-10deg); }
+    }
+
+    /* Animasi Salju Turun */
+    .snowflake {
+      position: absolute; top: -10px;
+      background: white; border-radius: 50%;
+      opacity: 0.8; filter: blur(1px);
+      animation: fall linear infinite;
+    }
+    @keyframes fall {
+      0% { transform: translateY(-10px) translateX(0); opacity: 1; }
+      100% { transform: translateY(100vh) translateX(20px); opacity: 0; }
+    }
   </style>
 </head>
 
 <body class="bg-gray-100 min-h-screen text-gray-800 font-sans p-4 lg:p-8 overflow-hidden" id="mainBody">
+   <!-- ================= TEMA OVERLAY (JANGAN DIHAPUS) ================= -->
+  <div id="theme-container" class="theme-overlay"></div>
 
   <div id="globalAlert" class="fixed top-4 right-4 z-[200] hidden bg-red-600 text-white px-6 py-3 rounded-xl shadow-2xl font-bold transition-all transform translate-y-0">
     <span id="globalAlertText">Error Terjadi!</span>
@@ -831,6 +865,58 @@
     window.onload = () => {
       App.UI.init();
     };
+
+     /* ---------------------------------------------------
+       4. THEME MANAGER (SISTEM TEMA GEREJAWI)
+    --------------------------------------------------- */
+    // SETTING: Ubah ke 'natal', 'paskah', 'pantekosta', atau 'otomatis'
+    const TEMA_AKTIF = 'otomatis'; 
+
+    function terapkanTema() {
+      const container = document.getElementById('theme-container');
+      let tema = TEMA_AKTIF;
+
+      // Logika Otomatis Berdasarkan Bulan
+      if (tema === 'otomatis') {
+        const bulanSekarang = new Date().getMonth() + 1; // 1-12
+        if (bulanSekarang === 12) tema = 'natal';
+        else if (bulanSekarang === 1) tema = 'tahun-baru';
+        else if (bulanSekarang === 4) tema = 'paskah'; // Perkiraan April
+        else tema = 'default';
+      }
+
+      // EKSEKUSI TEMA NATAL
+      if (tema === 'natal') {
+        // 1. Buat Bola Natal (Merah & Hijau) menggunakan icon/gambar
+        container.innerHTML += `
+          <img src="https://cdn-icons-png.flaticon.com/512/2360/2360930.png" class="ornament ornament-left" alt="Bola Natal Merah">
+          <img src="https://cdn-icons-png.flaticon.com/512/2360/2360918.png" class="ornament ornament-right" alt="Bola Natal Hijau">
+        `;
+
+        // 2. Buat Efek Salju (50 partikel)
+        for (let i = 0; i < 50; i++) {
+          let salju = document.createElement('div');
+          salju.classList.add('snowflake');
+          
+          // Randomisasi ukuran, posisi, dan kecepatan salju
+          let size = Math.random() * 6 + 2; // ukuran 2px - 8px
+          salju.style.width = size + 'px';
+          salju.style.height = size + 'px';
+          salju.style.left = Math.random() * 100 + 'vw';
+          salju.style.animationDuration = Math.random() * 3 + 2 + 's'; // durasi 2-5 detik jatuh
+          salju.style.animationDelay = Math.random() * 5 + 's'; // delay agar tidak turun bersamaan
+          
+          container.appendChild(salju);
+        }
+      } 
+      // Siapkan untuk tema lain di masa depan
+      else if (tema === 'paskah') {
+        // Logika tema paskah di sini (misal: daun palem, salib, dll)
+      }
+    }
+
+    // Panggil fungsi saat website dimuat
+    terapkanTema();
   </script>
 </body>
 </html>
